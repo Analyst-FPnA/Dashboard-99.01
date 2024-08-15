@@ -127,8 +127,12 @@ if 'df_9901' not in locals():
         # Menggabungkan semua DataFrame menjadi satu
         df_9901 = pd.concat(df_list, ignore_index=True)
 
-pic = st.selectbox("PIC:", ['CP','RESTO'])
-cab = st.selectbox("NAMA CABANG:", ['ALL','BDGTER'])
-wa_qty = st.selectbox("WEIGHT AVG/QTY:", ['WEIGHT AVG','QTY'])
+col = st.columns(3)
+with col[0]:
+    pic = st.selectbox("PIC:", ['CP','RESTO'])
+with col[1]:
+    cab = st.selectbox("NAMA CABANG:", ['ALL','BDGTER'])
+with col[2]:
+    wa_qty = st.selectbox("WEIGHT AVG/QTY:", ['WEIGHT AVG','QTY'])
 
 st.write(df_9901[(df_9901['PIC']==pic)].head())
