@@ -124,8 +124,8 @@ if 'df_9901' not in locals():
                   df = pd.read_csv(f)
                   df_list.append(df)
       
-      # Menggabungkan semua DataFrame menjadi satu
-      df_9901 = pd.concat(df_list, ignore_index=True)
+        # Menggabungkan semua DataFrame menjadi satu
+        df_9901 = pd.concat(df_list, ignore_index=True)
 
 pic = st.selectbox("PIC:", ['CP','RESTO'])
 cab = st.selectbox("NAMA CABANG:", ['ALL','BDGTER'])
