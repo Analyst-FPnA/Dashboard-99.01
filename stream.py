@@ -115,7 +115,8 @@ download_file_from_google_drive(file_id, dest_path)
 
 if 'df_9901' not in locals():
     with zipfile.ZipFile(f'downloaded_file.zip', 'r') as z:
-      for file_name in z.namelist():
+        df_list = []
+        for file_name in z.namelist():
           # Memeriksa apakah file tersebut berformat CSV
           if file_name.endswith('.csv'):
               # Membaca file CSV ke dalam DataFrame
