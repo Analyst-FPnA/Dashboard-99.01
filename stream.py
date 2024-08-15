@@ -135,4 +135,4 @@ with col[1]:
 with col[2]:
     wa_qty = st.selectbox("WEIGHT AVG/QTY:", ['WEIGHT AVG','QTY'])
 
-st.write(df_9901[(df_9901['PIC']==pic)].head())
+st.write(df_9901.head())
