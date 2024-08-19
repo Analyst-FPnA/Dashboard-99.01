@@ -150,11 +150,13 @@ if 'df_9901' not in locals():
         # Menggabungkan semua DataFrame menjadi satu
         df_9901 = pd.concat(df_list, ignore_index=True)
 
-col = st.columns(2)
+col = st.columns(3)
 with col[0]:
     pic = st.selectbox("PIC:", ['RESTO','CP','WIP','LAINNYA'], index=0)
 with col[1]:
     cab = st.selectbox("NAMA CABANG:", ['All'] + df_9901['Nama Cabang'].unique().tolist(), index=0)
+with col[2]:
+    kategori_barang = st.selectbox("NAMA CABANG:", ['All'] + df_9901['Kategori Barang'].unique().tolist(), index=df_9901['Kategori Barang'].unique().tolist().index('10.FOOD [RM] - COM')+1)
 
 col = st.columns(2)
 with col[0]:
@@ -205,7 +207,7 @@ if st.session_state.button_clicked:
     db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
                     db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
     
-    df_test = df_9901[df_9901['PIC']==pic].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
+    df_test = df_9901[(df_9901['PIC']==pic[0])&(df_9901['Kategori Barang']==kategori_barang[0])].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
     
     
     df_test['WEIGHT AVG'] = df_test['#Purch.Total'].astype(float)/df_test['#Prime.Qty'].astype(float)
