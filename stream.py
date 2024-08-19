@@ -281,6 +281,5 @@ if st.session_state.button_clicked:
         df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
     df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.2f}' if isinstance(x, float) else x)
 
-
-    st.write(df_test)
+    st.dataframe(df_test, use_container_width=True, hide_index=True)
 
