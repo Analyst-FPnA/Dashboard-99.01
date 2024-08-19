@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 import plotly.graph_objects as go
+import plotly.express as px
 
 # Fungsi untuk membuat barchart
 def plot_stylish_grouped_barchart(df):
