@@ -199,8 +199,8 @@ df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch
 df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
 df_test['Filter Barang'] = df_test['Kode #'].astype(str) + ' - ' + df_test['Nama Barang']
 
-if cab[0] != 'All' :
-    df_test = df_test[df_test['Nama Cabang']==cab[0]]
+if cab != 'All' :
+    df_test = df_test[df_test['Nama Cabang']==cab]
     
 df_test = df_test.groupby(['Month', 'Kode #','Nama Barang','Filter Barang']).agg({'QUANTITY': 'sum','WEIGHT AVG': 'mean'}).reset_index()
 list_bulan = [
@@ -208,7 +208,7 @@ list_bulan = [
         'July', 'August', 'September', 'October', 'November', 'December']
 df_test['Month'] = pd.Categorical(df_test['Month'], categories=list_bulan, ordered=True)
 df_test = df_test.sort_values('Month')
-df_test = df_test.pivot(index=['Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty[0]).fillna('').reset_index()
+df_test = df_test.pivot(index=['Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
 
 if len(bulan)>=3:
     df_test[f'Diff {bulan[-3]} - {bulan[-2]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-2]] == '') or (row[bulan[-3]]=='')) else ((row[bulan[-2]] - row[bulan[-3]]) / row[bulan[-3]]), axis=1)
