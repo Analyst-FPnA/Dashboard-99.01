@@ -185,7 +185,7 @@ if 'df_9901' not in locals():
 
 col = st.columns(2)
 with col[0]:
-    pic = st.selectbox("PIC:", ['RESTO','CP'], index=0)
+    pic = st.selectbox("PIC:", ['RESTO','CP','WIP','LAINNYA'], index=0)
 with col[1]:
     cab = st.selectbox("NAMA CABANG:", ['All'] + df_9901['Nama Cabang'].unique().tolist(), index=0)
 
@@ -229,6 +229,9 @@ if st.session_state.button_clicked:
     df_9901 = df_9901[df_9901['#Prime.NetPrice']!=0]
     df_9901['#Prime.Qty'] = df_9901['#Prime.Qty'].astype(float)
     df_9901['#Purch.Total'] = df_9901['#Purch.Total'].astype(float)
+    
+    df_9901['PIC'] = df_9901['PIC'].replace('','LAINNYA')
+    df_9901['Kategori Barang'] = df_9901['Kategori Barang'].replace('','LAINNYA')
     
     db = pd.read_csv('database barang.csv')
     db = db.drop_duplicates()
