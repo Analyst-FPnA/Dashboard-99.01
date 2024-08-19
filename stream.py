@@ -9,8 +9,46 @@ import tempfile
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import plotly.graph_objs as go
-import streamlit as st
+import plotly.graph_objects as go
+
+# Fungsi untuk membuat barchart
+def plot_grouped_barchart(df):
+    fig = go.Figure()
+
+    # Mendapatkan nama barang
+    nama_barang = df['Nama Barang']
+    
+    # Mendapatkan kolom bulan
+    bulan = df.columns[1:]
+    
+    # Warna berbeda untuk setiap bulan
+    colors = ['dodgerblue', 'orange', 'green']
+
+    # Menambahkan trace untuk setiap bulan
+    for i, b in enumerate(bulan[-3:]):
+        fig.add_trace(go.Bar(
+            x=df['Nama Barang'],
+            y=df[b],
+            name=b,
+            marker_color=colors[i % len(colors)],
+            text=df[b],
+            textposition='auto'
+        ))
+
+    # Menambahkan layout
+    fig.update_layout(
+        title='Barchart Kelompok per Nama Barang',
+        xaxis_title='Nama Barang',
+        yaxis_title='Jumlah Penjualan',
+        barmode='group',  # Mengelompokkan bar per nama barang
+        xaxis=dict(tickangle=-45),
+        margin=dict(l=50, r=50, t=50, b=50)
+    )
+
+    # Menampilkan barchart
+    st.plotly_chart(fig, use_container_width=True)
+
+
 
 def create_stylish_line_plot(df, x_col, y1_col, y2_col, title="Stylish Line Plot", x_label="X", y_label="Values"):
     """
@@ -242,6 +280,8 @@ if st.session_state.button_clicked:
     if 'All' not in barang:
         df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
     df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.2f}' if isinstance(x, float) else x)
+    plot_grouped_barchart(df_test2)
+    
     st.write(df_test2)
     st.write(df_test)
 
