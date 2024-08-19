@@ -22,19 +22,16 @@ def plot_grouped_barchart(df):
     # Warna berbeda untuk setiap bulan
     colors = px.colors.qualitative.Plotly
 
-    # Membuat trace untuk setiap bulan
-    traces = []
+    # Menambahkan trace untuk setiap bulan
     for i, b in enumerate(bulan[-3:]):
-        traces.append(go.Bar(
+        fig.add_trace(go.Bar(
             x=df['Nama Barang'],
             y=df[b],
             name=b,
             marker_color=colors[i % len(colors)],
             text=df[b],
-            textposition='auto',
-            hoverinfo='y+name'
+            textposition='auto'
         ))
-
 
     # Menambahkan layout
     fig.update_layout(
@@ -48,8 +45,6 @@ def plot_grouped_barchart(df):
 
     # Menampilkan barchart
     st.plotly_chart(fig, use_container_width=True)
-
-
 
 
 
