@@ -158,7 +158,7 @@ with col[1]:
 with col[2]:
     kategori_barang = st.selectbox("KATEGORI BARANG:", ['All'] + df_9901['Kategori Barang'].unique().tolist(), index=df_9901['Kategori Barang'].unique().tolist().index('10.FOOD [RM] - COM')+1)
 
-col = st.columns(2)
+col = st.columns(3)
 with col[0]:
     wa_qty = st.selectbox("WEIGHT AVG/QTY:", ['WEIGHT AVG','QUANTITY'], index= 0)
 with col[1]:
