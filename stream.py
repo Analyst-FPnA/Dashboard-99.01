@@ -111,7 +111,7 @@ def load_csv(file_path):
 
 # Unduh file dari GitHub
 download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/PIC v.2.csv', 'PIC v.2.csv')
-download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/database barang.csv', database barang.csv')
+download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/database barang.csv', 'database barang.csv')
 
 
 st.title('Dashboard - 99.01')
