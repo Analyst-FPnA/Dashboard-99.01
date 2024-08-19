@@ -193,7 +193,9 @@ db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Ko
                 db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
 
 df_test = df_9901[df_9901['PIC']==pic].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
+st.write(df_test['Month'].unique())
 df_test = df_test[df_test['#Purch.Total']!='']
+st.write(df_test['Month'].unique())
 df_test['WEIGHT AVG'] = df_test['#Purch.Total'].astype(float)/df_test['#Prime.Qty'].astype(float)
 df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch.Total')
 df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
