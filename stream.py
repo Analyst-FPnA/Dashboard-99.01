@@ -38,8 +38,8 @@ def plot_grouped_barchart(df):
     # Menambahkan layout
     fig.update_layout(
         title='',
-        xaxis_title='Nama Barang',
-        yaxis_title='Jumlah Penjualan',
+        xaxis_title='NAMA BARANG',
+        yaxis_title=f'{wa_qty}',
         barmode='group',  # Mengelompokkan bar per nama barang
         xaxis=dict(tickangle=-45),
         margin=dict(l=50, r=50, t=50, b=50)
@@ -64,7 +64,7 @@ def create_line_chart(df):
     # Membuat layout untuk plot
     layout = go.Layout(
         title=dict(text='', x=0.5, font=dict(size=20, color='darkblue')),
-        xaxis=dict(title='Month', titlefont=dict(size=16, color='darkblue')),
+        xaxis=dict(title='MONTH', titlefont=dict(size=16, color='darkblue')),
         yaxis=dict(title=f'{wa_qty}', titlefont=dict(size=16, color='darkblue')),
         plot_bgcolor='white',
         xaxis_gridcolor='lightgray',
