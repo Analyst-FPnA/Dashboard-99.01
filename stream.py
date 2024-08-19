@@ -65,7 +65,7 @@ def create_line_chart(df):
     layout = go.Layout(
         title=dict(text='', x=0.5, font=dict(size=20, color='darkblue')),
         xaxis=dict(title='Month', titlefont=dict(size=16, color='darkblue')),
-        yaxis=dict(title='Sales', titlefont=dict(size=16, color='darkblue')),
+        yaxis=dict(title=f'{wa_qty}', titlefont=dict(size=16, color='darkblue')),
         plot_bgcolor='white',
         xaxis_gridcolor='lightgray',
         yaxis_gridcolor='lightgray',
