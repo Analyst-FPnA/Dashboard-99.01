@@ -148,13 +148,13 @@ if 'df_9901' not in locals():
 
 col = st.columns(2)
 with col[0]:
-    pic = st.selectbox("PIC:", ['CP','RESTO'])
+    pic = st.selectbox("PIC:", ['CP','RESTO'], index=0)
 with col[1]:
-    cab = st.selectbox("NAMA CABANG:", df_9901['Nama Cabang'].unique().tolist()+['All'], default=['All'])
+    cab = st.selectbox("NAMA CABANG:", df_9901['Nama Cabang'].unique().tolist()+['All'], index=-1)
 
 col = st.columns(2)
 with col[0]:
-    wa_qty = st.selectbox("WEIGHT AVG/QTY:", ['WEIGHT AVG','QUANTITY'], default = ['WEIGHT AVG'])
+    wa_qty = st.selectbox("WEIGHT AVG/QTY:", ['WEIGHT AVG','QUANTITY'], index= 0)
 with col[1]:
     list_bulan = [
         'January', 'February', 'March', 'April', 'May', 'June',
