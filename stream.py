@@ -18,9 +18,6 @@ def plot_grouped_barchart(df):
     # Mendapatkan nama barang
     nama_barang = df['Nama Barang']
     
-    # Mendapatkan kolom bulan
-    bulan = df.columns[1:]
-    
     # Warna berbeda untuk setiap bulan
     colors = ['dodgerblue', 'orange', 'green']
 
