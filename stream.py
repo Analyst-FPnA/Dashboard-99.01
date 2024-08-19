@@ -186,7 +186,7 @@ df_9901['Kode #'] = df_9901['Kode #'].astype('int64')
 df_9901 = pd.merge(df_9901, df_pic, how='left', on='Kode #').fillna('')
 df_9901 = df_9901.loc[:,['Nama Cabang','Kota/Kabupaten','Provinsi Gudang','Nomor #','Tanggal','Pemasok','Kategori Pemasok','#Group','Kode #','Nama Barang','Kategori Barang','#Purch.Qty','#Purch.UoM','#Prime.Ratio','#Prime.Qty','#Prime.UoM','#Purch.@Price','#Purch.Discount','#Prime.NetPrice','#Purch.Total','Month','PIC']]
 df_9901 = df_9901[df_9901['#Prime.NetPrice']!=0]
-
+st.write(df_9901['Month'].unique())
 db = pd.read_csv('database barang.csv')
 db = db.drop_duplicates()
 db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
