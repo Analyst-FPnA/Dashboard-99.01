@@ -145,7 +145,7 @@ if 'df_9901' not in locals():
       
         # Menggabungkan semua DataFrame menjadi satu
         df_9901 = pd.concat(df_list, ignore_index=True)
-
+st.write(df_9901.head())
 col = st.columns(2)
 with col[0]:
     pic = st.selectbox("PIC:", ['CP','RESTO'], index=0)
@@ -162,8 +162,7 @@ with col[1]:
     bulan = st.multiselect("BULAN:", list_bulan, default = ['June','May','July'])
     bulan = sorted(bulan, key=lambda x: list_bulan.index(x))
 
-
-category = ['TOP']
+category = st.selectbox("TOP/BOTTOM:", ['TOP','BOTTOM'], index= 0)
 barang = ['All']
 
 columns_to_clean = ['#Purch.Qty', '#Purch.@Price', '#Purch.Discount', '#Purch.Total', '#Prime.Ratio', '#Prime.Qty', '#Prime.NetPrice']
@@ -193,7 +192,7 @@ db = db.drop_duplicates()
 db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
                 db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
 
-df_test = df_9901[df_9901['PIC']==pic[0]].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
+df_test = df_9901[df_9901['PIC']==pic].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
 df_test['WEIGHT AVG'] = df_test['#Purch.Total']/df_test['#Prime.Qty']
 df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch.Total')
 df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
@@ -203,9 +202,7 @@ if cab != 'All' :
     df_test = df_test[df_test['Nama Cabang']==cab]
     
 df_test = df_test.groupby(['Month', 'Kode #','Nama Barang','Filter Barang']).agg({'QUANTITY': 'sum','WEIGHT AVG': 'mean'}).reset_index()
-list_bulan = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December']
+
 df_test['Month'] = pd.Categorical(df_test['Month'], categories=list_bulan, ordered=True)
 df_test = df_test.sort_values('Month')
 df_test = df_test.pivot(index=['Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
@@ -221,10 +218,10 @@ if len(bulan)==2:
     df_test = df_test.sort_values(df_test.columns[-1],ascending=False)
     #df_test.loc[:,df_test.columns[-1]] = df_test.loc[:,df_test.columns[-1:]].apply(lambda x: f'{x*100:.2f}%')
 
-if category[0]=='Top':
+if category=='Top':
     df_test2 = df_test[(df_test[df_test.columns[-1]]>0) & (df_test[df_test.columns[-2]]>0)]
     df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=False).index].head(10)
-if category[0]=='Bottom':
+if category=='Bottom':
     df_test2 = df_test[(df_test[df_test.columns[-1]]<0) & (df_test[df_test.columns[-2]]<0)]
     df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=True).index].head(10)
 
