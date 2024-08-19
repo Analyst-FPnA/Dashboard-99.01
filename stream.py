@@ -182,7 +182,6 @@ if st.session_state.button_clicked:
     
     numeric_cols = ['#Purch.Qty', '#Prime.Ratio', '#Prime.Qty', '#Purch.@Price', '#Purch.Discount', '#Prime.NetPrice', '#Purch.Total']
     df_9901[numeric_cols] = df_9901[numeric_cols].apply(pd.to_numeric)
-    st.write(df_9901[df_9901['#Purch.Total']==''].head())
     
     df_pic  =   pd.read_csv('PIC v.2.csv').drop(columns=['Nama Barang','Kategori Barang'])
     df_pic['Kode #'] = df_pic['Kode #'].astype('int64')
@@ -197,7 +196,6 @@ if st.session_state.button_clicked:
     db = db.drop_duplicates()
     db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
                     db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
-    st.write(df_9901[df_9901['#Purch.Total']==''].head())
     
     df_test = df_9901[df_9901['PIC']==pic].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
     
@@ -206,7 +204,6 @@ if st.session_state.button_clicked:
     df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch.Total')
     df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
     df_test['Filter Barang'] = df_test['Kode #'].astype(str) + ' - ' + df_test['Nama Barang']
-    st.write(df_test['Month'].unique())
     
     if cab != 'All' :
         df_test = df_test[df_test['Nama Cabang']==cab]
@@ -216,8 +213,7 @@ if st.session_state.button_clicked:
     df_test['Month'] = pd.Categorical(df_test['Month'], categories=list_bulan, ordered=True)
     df_test = df_test.sort_values('Month')
     df_test = df_test.pivot(index=['Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
-    st.write(df_test)
-    st.write(df_test.apply(lambda row: 0 if ((row[bulan[-2]] == '') or (row[bulan[-3]]=='')) else ((row[bulan[-2]] - row[bulan[-3]]) / row[bulan[-3]]), axis=1))
+    
     if len(bulan)>=3:
         df_test[f'Diff {bulan[-3]} - {bulan[-2]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-2]] == '') or (row[bulan[-3]]=='')) else ((row[bulan[-2]] - row[bulan[-3]]) / row[bulan[-3]]), axis=1)
         df_test[f'Diff {bulan[-2]} - {bulan[-1]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-1]] == '') or (row[bulan[-2]]=='')) else ((row[bulan[-1]] - row[bulan[-2]]) / row[bulan[-2]]), axis=1)
@@ -228,16 +224,16 @@ if st.session_state.button_clicked:
         df_test = df_test.sort_values(df_test.columns[-1],ascending=False)
         #df_test.loc[:,df_test.columns[-1]] = df_test.loc[:,df_test.columns[-1:]].apply(lambda x: f'{x*100:.2f}%')
     
-    if category=='Top':
+    if category=='TOP':
         df_test2 = df_test[(df_test[df_test.columns[-1]]>0) & (df_test[df_test.columns[-2]]>0)]
         df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=False).index].head(10)
-    if category=='Bottom':
+    if category=='BOTTOM':
         df_test2 = df_test[(df_test[df_test.columns[-1]]<0) & (df_test[df_test.columns[-2]]<0)]
         df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=True).index].head(10)
     
     df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]] = df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]].applymap(lambda x: f'{x*100:.2f}%')
     if len([x  for x in df_test.columns if 'Diff' in x])>1:
-        df_test = df_test.drop(columns=[df_test2.columns[-2]])
+        df_test = df_test.drop(columns=[df_test.columns[-2]])
     if 'All' in barang:
         df_test = df_test.drop(columns='Filter Barang')
     if 'All' not in barang:
