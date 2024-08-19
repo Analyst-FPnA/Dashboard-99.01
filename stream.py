@@ -11,6 +11,7 @@ import seaborn as sns
 
 import plotly.graph_objects as go
 import plotly.express as px
+import numpy as np
 
 # Fungsi untuk membuat barchart
 def plot_grouped_barchart(df):
