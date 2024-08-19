@@ -168,8 +168,8 @@ barang = ['All']
 columns_to_clean = ['#Purch.Qty', '#Purch.@Price', '#Purch.Discount', '#Purch.Total', '#Prime.Ratio', '#Prime.Qty', '#Prime.NetPrice']
 
 # Remove commas from values in specified columns
-for col in columns_to_clean:
-    df_9901[col] = df_9901[col].str.replace(',', '')
+#for col in columns_to_clean:
+#    df_9901[col] = df_9901[col].str.replace(',', '')
 
 #Udang Kupas - CP replace Udang Thawing
 df_9901['Kode #'] = df_9901['Kode #'].replace('100084', '100167')
@@ -177,6 +177,7 @@ df_9901['Nama Barang'] = df_9901['Nama Barang'].replace('UDANG KUPAS - CP', 'UDA
 
 numeric_cols = ['#Purch.Qty', '#Prime.Ratio', '#Prime.Qty', '#Purch.@Price', '#Purch.Discount', '#Prime.NetPrice', '#Purch.Total']
 df_9901[numeric_cols] = df_9901[numeric_cols].apply(pd.to_numeric)
+st.write(df_9901[df_9901['#Purch.Total']==''].head())
 
 df_pic  =   pd.read_csv('PIC v.2.csv').drop(columns=['Nama Barang','Kategori Barang'])
 df_pic['Kode #'] = df_pic['Kode #'].astype('int64')
@@ -191,7 +192,7 @@ db = pd.read_csv('database barang.csv')
 db = db.drop_duplicates()
 db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
                 db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
-st.write(df_9901[df_9901['#Purch.Total']==''])
+st.write(df_9901[df_9901['#Purch.Total']==''].head())
 
 df_test = df_9901[df_9901['PIC']==pic].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
 
