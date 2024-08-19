@@ -148,7 +148,7 @@ if 'df_9901' not in locals():
 st.write(df_9901.head())
 col = st.columns(2)
 with col[0]:
-    pic = st.selectbox("PIC:", ['CP','RESTO'], index=0)
+    pic = st.selectbox("PIC:", ['RESTO','CP'], index=0)
 with col[1]:
     cab = st.selectbox("NAMA CABANG:", ['All'] + df_9901['Nama Cabang'].unique().tolist(), index=0)
 
@@ -159,7 +159,7 @@ with col[1]:
     list_bulan = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December']
-    bulan = st.multiselect("BULAN:", list_bulan, default = ['June','May','July'])
+    bulan = st.multiselect("BULAN:", list_bulan, default = ['May','June','July'])
     bulan = sorted(bulan, key=lambda x: list_bulan.index(x))
 
 category = st.selectbox("TOP/BOTTOM:", ['TOP','BOTTOM'], index= 0)
@@ -241,7 +241,7 @@ if st.session_state.button_clicked:
         df_test = df_test.drop(columns='Filter Barang')
     if 'All' not in barang:
         df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-    df_test.loc[:,[x for x in df.columns if x in list_bulan]] = df_test.loc[:,[x for x in df.columns if x in list_bulan]].applymap(lambda x: f'{x:.2f}')
+    df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.2f}')
     st.write(df_test2)
     st.write(df_test)
 
