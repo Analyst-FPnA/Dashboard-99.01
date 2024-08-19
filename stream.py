@@ -150,7 +150,7 @@ col = st.columns(2)
 with col[0]:
     pic = st.selectbox("PIC:", ['CP','RESTO'], index=0)
 with col[1]:
-    cab = st.selectbox("NAMA CABANG:", df_9901['Nama Cabang'].unique().tolist()+['All'], index=-1)
+    cab = st.selectbox("NAMA CABANG:", ['All'] + df_9901['Nama Cabang'].unique().tolist(), index=0)
 
 col = st.columns(2)
 with col[0]:
