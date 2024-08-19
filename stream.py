@@ -13,11 +13,13 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 # Fungsi untuk membuat barchart
-def plot_stylish_grouped_barchart(df):
+def plot_grouped_barchart(df):
+    fig = go.Figure()
+
     # Mendapatkan nama barang
     nama_barang = df['Nama Barang']
     
-    # Palet warna yang menarik
+    # Warna berbeda untuk setiap bulan
     colors = px.colors.qualitative.Plotly
 
     # Membuat trace untuk setiap bulan
@@ -33,37 +35,16 @@ def plot_stylish_grouped_barchart(df):
             hoverinfo='y+name'
         ))
 
-    # Menambahkan layout
-    layout = go.Layout(
-        title=dict(
-            text='Penjualan per Nama Barang berdasarkan Bulan',
-            x=0.5,
-            font=dict(size=20, color='darkblue')
-        ),
-        xaxis=dict(
-            title='Nama Barang',
-            titlefont=dict(size=16, color='darkblue'),
-            tickangle=-45
-        ),
-        yaxis=dict(
-            title=f'{wa_qty}',
-            titlefont=dict(size=16, color='darkblue')
-        ),
-        barmode='group',
-        legend=dict(
-            title='Bulan',
-            font=dict(size=12),
-            x=0.5,
-            y=1.1,
-            orientation='h'
-        ),
-        plot_bgcolor='white',
-        paper_bgcolor='lightgray',
-        margin=dict(l=50, r=50, t=80, b=50)
-    )
 
-    # Membuat figure dari trace dan layout
-    fig = go.Figure(data=traces, layout=layout)
+    # Menambahkan layout
+    fig.update_layout(
+        title='Barchart Kelompok per Nama Barang',
+        xaxis_title='Nama Barang',
+        yaxis_title='Jumlah Penjualan',
+        barmode='group',  # Mengelompokkan bar per nama barang
+        xaxis=dict(tickangle=-45),
+        margin=dict(l=50, r=50, t=50, b=50)
+    )
 
     # Menampilkan barchart
     st.plotly_chart(fig, use_container_width=True)
@@ -302,7 +283,7 @@ if st.session_state.button_clicked:
     if 'All' not in barang:
         df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
     df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.2f}' if isinstance(x, float) else x)
-    plot_stylish_grouped_barchart(df_test2)
+    plot_grouped_barchart(df_test2)
     
     st.write(df_test2)
     st.write(df_test)
