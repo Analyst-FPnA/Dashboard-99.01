@@ -180,7 +180,7 @@ if 'df_9901' not in locals():
       
         # Menggabungkan semua DataFrame menjadi satu
         df_9901 = pd.concat(df_list, ignore_index=True)
-st.write(df_9901.head())
+
 col = st.columns(2)
 with col[0]:
     pic = st.selectbox("PIC:", ['RESTO','CP'], index=0)
