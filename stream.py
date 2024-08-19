@@ -30,7 +30,8 @@ def plot_grouped_barchart(df):
             name=b,
             marker_color=colors[i % len(colors)],
             text=df[b],
-            textposition='auto'
+            textposition='outside',
+            textangle=-90,
         ))
 
     # Menambahkan layout
@@ -150,7 +151,7 @@ download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashbo
 download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/database barang.csv', 'database barang.csv')
 
 
-st.title('Dashboard - 99.01')
+st.title('Dashboard - Analisa Harga Barang')
 
 if 'button_clicked' not in st.session_state:
     st.session_state.button_clicked = False
@@ -272,10 +273,10 @@ if st.session_state.button_clicked:
     if len([x  for x in df_test.columns if 'Diff' in x])>1:
         df_test = df_test.drop(columns=[df_test.columns[-2]])
     
-    if wa_qty =='WEIGHT AVG'     
+    if wa_qty =='WEIGHT AVG':     
         df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:.2f}' if isinstance(x, float) else x)
         df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.2f}' if isinstance(x, float) else x)
-    if wa_qty =='QUANTITY'     
+    if wa_qty =='QUANTITY':     
         df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,0f}' if isinstance(x, float) else x)
         df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
 
