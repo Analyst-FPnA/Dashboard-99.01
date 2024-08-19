@@ -191,8 +191,9 @@ db = pd.read_csv('database barang.csv')
 db = db.drop_duplicates()
 db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
                 db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
-df_test['#Prime.Qty'] = df_test['#Prime.Qty'].astype(float)
-df_test['#Purch.Total'] = df_test['#Purch.Total'].astype(float)
+df_9901['#Prime.Qty'] = df_9901['#Prime.Qty'].astype(float)
+df_9901['#Purch.Total'] = df_9901['#Purch.Total'].astype(float)
+
 df_test = df_9901[df_9901['PIC']==pic].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
 
 st.write(df_test[df_test['#Purch.Total']==''])
