@@ -169,8 +169,8 @@ columns_to_clean = ['#Purch.Qty', '#Purch.@Price', '#Purch.Discount', '#Purch.To
 
 # Remove commas from values in specified columns
 for col in columns_to_clean:
-    df_9901[col] = df_9901[col].apply(lambda x: x.replace(',', '') if ',' in str(x) else x)
-    df_9901[col] = df_9901[col].apply(lambda x: x.replace('.', '') if '.' in str(x) else x).astype(int)
+    df_9901[col] = df_9901[col].apply(lambda x: x.replace(',', '') if ',' in str(x) else x).astype(float)
+    #df_9901[col] = df_9901[col].apply(lambda x: x.replace('.', '') if '.' in str(x) else x)
 
 #Udang Kupas - CP replace Udang Thawing
 df_9901['Kode #'] = df_9901['Kode #'].replace('100084', '100167')
