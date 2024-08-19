@@ -207,7 +207,7 @@ if st.session_state.button_clicked:
     db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
                     db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
     
-    df_test = df_9901[(df_9901['PIC']==pic[0])&(df_9901['Kategori Barang']==kategori_barang)].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
+    df_test = df_9901[(df_9901['PIC']==pic)&(df_9901['Kategori Barang']==kategori_barang)].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
     
     
     df_test['WEIGHT AVG'] = df_test['#Purch.Total'].astype(float)/df_test['#Prime.Qty'].astype(float)
