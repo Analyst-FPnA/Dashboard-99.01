@@ -236,7 +236,7 @@ if st.session_state.button_clicked:
     if len([x  for x in df_test.columns if 'Diff' in x])>1:
         df_test = df_test.drop(columns=[df_test.columns[-2]])
         
-    barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().to_list(), default = ['All'])
+    barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
     if 'All' in barang:
         df_test = df_test.drop(columns='Filter Barang')
     if 'All' not in barang:
