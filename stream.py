@@ -48,69 +48,35 @@ def plot_grouped_barchart(df):
     st.plotly_chart(fig, use_container_width=True)
 
 
-
-def create_stylish_line_plot(df, x_col, y1_col, y2_col, title="Stylish Line Plot", x_label="X", y_label="Values"):
-    """
-    Membuat line plot yang menarik dengan dua kolom y berbeda dan kolom x sebagai sumbu x.
-
-    Parameters:
-    - df: DataFrame yang berisi data.
-    - x_col: Nama kolom yang akan digunakan sebagai sumbu x.
-    - y1_col: Nama kolom yang akan digunakan sebagai garis pertama.
-    - y2_col: Nama kolom yang akan digunakan sebagai garis kedua.
-    - title: Judul plot.
-    - x_label: Label untuk sumbu x.
-    - y_label: Label untuk sumbu y.
-    """
-    
-    # Membuat trace untuk y1
-    trace1 = go.Scatter(
-        x=df[x_col],
-        y=df[y1_col],
-        mode='lines+markers',
-        name='SELISIH',
+# Fungsi untuk membuat line chart
+def create_line_chart(df):
+    # Membuat trace untuk Sales
+    trace = go.Scatter(
+        x=df.index,
+        y=df.values,
+        mode='lines+markers',  # Garis dengan titik marker
+        name='Sales',
         line=dict(color='dodgerblue', width=2),
-        marker=dict(size=8)
-    )
-
-    # Membuat trace untuk y2
-    trace2 = go.Scatter(
-        x=df[x_col],
-        y=df[y2_col],
-        mode='lines+markers',
-        name='CANCEL NOTA',
-        line=dict(color='orange', width=2),
         marker=dict(size=8)
     )
 
     # Membuat layout untuk plot
     layout = go.Layout(
-        title=dict(text=title, x=0.5, font=dict(size=20, color='darkblue')),
-        xaxis=dict(title=x_label, titlefont=dict(size=16, color='darkblue')),
-        yaxis=dict(title=y_label, titlefont=dict(size=16, color='darkblue')),
-        showlegend=True,
-        legend=dict(font=dict(size=12), x=0, y=1),
-        margin=dict(l=50, r=50, t=50, b=50),
-        hovermode='closest',
+        title=dict(text='Monthly Sales Over Time', x=0.5, font=dict(size=20, color='darkblue')),
+        xaxis=dict(title='Month', titlefont=dict(size=16, color='darkblue')),
+        yaxis=dict(title='Sales', titlefont=dict(size=16, color='darkblue')),
         plot_bgcolor='white',
         xaxis_gridcolor='lightgray',
         yaxis_gridcolor='lightgray',
-        shapes=[
-            # Garis putus-putus merah di y=0.5
-            dict(
-                type="line",
-                x0=df[x_col].min(), x1=df[x_col].max(),
-                y0=0.5, y1=0.5,
-                line=dict(color="red", width=1, dash="dash")
-            )
-        ]
+        hovermode='closest'
     )
 
     # Membuat figure dari trace dan layout
-    fig = go.Figure(data=[trace1, trace2], layout=layout)
+    fig = go.Figure(data=[trace], layout=layout)
 
     # Menampilkan plot di Streamlit
     st.plotly_chart(fig, use_container_width=True)
+
 
     
 st.set_page_config(layout="wide")
@@ -275,20 +241,19 @@ if st.session_state.button_clicked:
     df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]] = df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]].applymap(lambda x: f'{x*100:.2f}%')
     if len([x  for x in df_test.columns if 'Diff' in x])>1:
         df_test = df_test.drop(columns=[df_test.columns[-2]])
-    
+    df_month = df_test[[x for x in df_test.columns if x in list_bulan]].replace('',np.nan).fillna(method='ffill', axis=1).fillna(method='bfill', axis=1).mean().apply(lambda x: f'{x:.3f}')
     if wa_qty =='WEIGHT AVG':     
         df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
         df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
     if wa_qty =='QUANTITY':     
         df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
         df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
-
+    create_line_chart(dF_month)
     plot_grouped_barchart(df_test2)    
     barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
     if 'All' in barang:
         df_test = df_test.drop(columns='Filter Barang')
     if 'All' not in barang:
         df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-
     st.dataframe(df_test, use_container_width=True, hide_index=True)
 
