@@ -154,7 +154,7 @@ col = st.columns(3)
 with col[0]:
     pic = st.selectbox("PIC:", ['RESTO','CP','WIP','LAINNYA'], index=0)
 with col[1]:
-    cab = st.selectbox("NAMA CABANG:", ['All'] + df_9901['Nama Cabang'].unique().tolist(), index=0)
+    cab = st.selectbox("NAMA CABANG:", ['All'] + sorted(df_9901['Nama Cabang'].unique().tolist()), index=0)
 with col[2]:
     kategori_barang = st.selectbox("KATEGORI BARANG:", ['All'] + df_9901['Kategori Barang'].unique().tolist(), index=df_9901['Kategori Barang'].unique().tolist().index('10.FOOD [RM] - COM')+1)
 
