@@ -235,13 +235,13 @@ if st.session_state.button_clicked:
         #df_test.loc[:,df_test.columns[-1]] = df_test.loc[:,df_test.columns[-1:]].apply(lambda x: f'{x*100:.2f}%')
     
     if category=='TOP':
-        if len(bulan)>=2:
+        if len(bulan)>=3:
             df_test2 = df_test[(df_test[df_test.columns[-1]]>0) & (df_test[df_test.columns[-2]]>0)]
         if len(bulan)==2:
             df_test2 = df_test[(df_test[df_test.columns[-1]]>0)]
         df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=False).index].head(10)
     if category=='BOTTOM':
-        if len(bulan)>=2:
+        if len(bulan)>=3:
             df_test2 = df_test[(df_test[df_test.columns[-1]]<0) & (df_test[df_test.columns[-2]]<0)]
         if len(bulan)==2:
             df_test2 = df_test[(df_test[df_test.columns[-1]]<0)]        
