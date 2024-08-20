@@ -237,15 +237,17 @@ if st.session_state.button_clicked:
     if category=='TOP':
         if len(bulan)>=3:
             df_test2 = df_test[(df_test[df_test.columns[-1]]>0) & (df_test[df_test.columns[-2]]>0)]
+            df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=False).index].head(10)
         if len(bulan)==2:
-            df_test2 = df_test[(df_test[df_test.columns[-1]]>0)]
-        df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=False).index].head(10)
+            df_test2 = df_test[(df_test[df_test.columns[-1]]>0)].head(10)
+        
     if category=='BOTTOM':
         if len(bulan)>=3:
             df_test2 = df_test[(df_test[df_test.columns[-1]]<0) & (df_test[df_test.columns[-2]]<0)]
+            df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=True).index].head(10)
         if len(bulan)==2:
-            df_test2 = df_test[(df_test[df_test.columns[-1]]<0)]        
-        df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=True).index].head(10)
+            df_test2 = df_test[(df_test[df_test.columns[-1]]<0)].head(10)       
+        
     
     df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]] = df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]].applymap(lambda x: f'{x*100:.2f}%')
     if len([x  for x in df_test.columns if 'Diff' in x])>1:
