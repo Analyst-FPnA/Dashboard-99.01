@@ -16,35 +16,24 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objs as go
 
-
+geojson_url = "https://github.com/superpikar/indonesia-geojson/blob/master/indonesia-province.json"
 # Fungsi untuk membuat map chart
 def create_sales_map_chart(df):
-    
-    # Membuat peta choropleth
-    fig =  go.Figure(data=go.Choropleth(
-    locations = df['state_code'],
-    z = df['WEIGHT AVG'],
-    text = df['Provinsi'],
-    colorscale = 'Inferno',
-    autocolorscale=False,
-    reversescale=True,
-    marker_line_color='darkgray',
-    marker_line_width=0.5,
-    colorbar_title = 'Years'))
-
-    # Mengatur layout peta
-    fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(
-        title=dict(text='Sales Distribution Across Provinces in Indonesia', x=0.5, font=dict(size=20, color='darkblue')),
-        geo=dict(
-            scope='asia',
-            projection_type='mercator',
-            showlakes=False,
-            showland=True,
-            showcountries=True,
-        ),
-        margin={"r":0,"t":50,"l":0,"b":0}
+        
+    fig = px.choropleth(
+        df, 
+        geojson=geojson_url, 
+        locations='Provinsi', 
+        featureidkey="properties.name", 
+        color='WEIGHT AVG',
+        hover_name='Provinsi',
+        hover_data={'WEIGHT AVG': True},
+        color_continuous_scale='Viridis'
+        title='WEIGHT AVG'
     )
+    
+    # Mengupdate peta untuk fokus ke Indonesia
+    fig.update_geos(fitbounds="locations", visible=False)
 
     # Menampilkan map chart di Streamlit
     st.plotly_chart(fig, use_container_width=True)
