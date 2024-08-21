@@ -310,7 +310,7 @@ if st.session_state.button_clicked:
     create_line_chart(st.session_state.filtered_df_month)
     plot_grouped_barchart(st.session_state.filtered_df_test2)
     
-if st.session_state.filtered_df_test is not None:
+if df_test is not None:
     prov = pd.read_csv('prov.csv')    
     barang = st.multiselect("NAMA BARANG:", ['All']+st.session_state.filtered_df_test .sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
     if 'All' in barang:
