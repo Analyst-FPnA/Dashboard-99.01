@@ -302,8 +302,11 @@ if st.session_state.button_clicked:
     if wa_qty =='QUANTITY':     
         df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
         df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
-    create_line_chart(df_month)
-    plot_grouped_barchart(df_test2)    
+    st.session_state.filtered_df_month = df_month    
+    st.session_state.filtered_df_test2 = df_test2
+    
+    create_line_chart(st.session_state.filtered_df_month)
+    plot_grouped_barchart(st.session_state.filtered_df_test2)    
     barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
     
     if 'All' in barang:
@@ -312,6 +315,7 @@ if st.session_state.button_clicked:
     if 'All' not in barang:
         df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
         df_prov = df_prov[df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+    st.session_state.filtered_df_test = df_test
     create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
-    st.dataframe(df_test, use_container_width=True, hide_index=True)
+    st.dataframe(st.session_state.filtered_df_test, use_container_width=True, hide_index=True)
         
