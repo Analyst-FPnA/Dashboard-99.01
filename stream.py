@@ -15,14 +15,17 @@ import numpy as np
 import streamlit as st
 import pandas as pd
 import plotly.graph_objs as go
+from urllib.request import urlopen
+import json
 
-geojson_url = "https://github.com/superpikar/indonesia-geojson/blob/master/indonesia-province.json"
+with urlopen('https://github.com/superpikar/indonesia-geojson/blob/master/indonesia-province.json?raw=true') as response:
+    ccaa = json.load(response)
 # Fungsi untuk membuat map chart
 def create_sales_map_chart(df):
         
     fig = px.choropleth(
         df, 
-        geojson=geojson_url, 
+        geojson=ccaa, 
         locations='Provinsi', 
         featureidkey="properties.Propinsi", 
         color='WEIGHT AVG',
