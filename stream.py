@@ -12,6 +12,42 @@ import seaborn as sns
 import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
+import streamlit as st
+import pandas as pd
+import plotly.graph_objs as go
+
+
+# Fungsi untuk membuat map chart
+def create_sales_map_chart(df):
+    
+    # Membuat peta choropleth
+    fig = go.Figure(go.Choropleth(
+        geojson="https://raw.githubusercontent.com/kelvins/ISO-3166-Countries-with-Regional-Codes/master/all/all.geojson",
+        locations=df['state_code'],
+        z=df['WEIGHT AVG'],
+        featureidkey="properties.iso_3166_2",
+        locationmode='geojson-id',
+        colorscale='Blues',
+        colorbar_title="Sales",
+    ))
+
+    # Mengatur layout peta
+    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_layout(
+        title=dict(text='Sales Distribution Across Provinces in Indonesia', x=0.5, font=dict(size=20, color='darkblue')),
+        geo=dict(
+            scope='asia',
+            projection_type='mercator',
+            showlakes=False,
+            showland=True,
+            showcountries=True,
+        ),
+        margin={"r":0,"t":50,"l":0,"b":0}
+    )
+
+    # Menampilkan map chart di Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+
 
 # Fungsi untuk membuat barchart
 def plot_grouped_barchart(df):
@@ -116,6 +152,7 @@ def load_csv(file_path):
 # Unduh file dari GitHub
 download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/PIC v.2.csv', 'PIC v.2.csv')
 download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/database barang.csv', 'database barang.csv')
+download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/df_iso.csv', 'df_iso.csv')
 
 
 st.title('Dashboard - Analisa Harga Barang')
@@ -202,6 +239,7 @@ if st.session_state.button_clicked:
     df_9901['PIC'] = df_9901['PIC'].replace('','LAINNYA')
     df_9901['Kategori Barang'] = df_9901['Kategori Barang'].replace('','LAINNYA')
     
+    df_iso = pd.read_csv('df_iso.csv')
     db = pd.read_csv('database barang.csv')
     db = db.drop_duplicates()
     db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
@@ -214,6 +252,7 @@ if st.session_state.button_clicked:
     df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch.Total')
     df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
     df_test['Filter Barang'] = df_test['Kode #'].astype(str) + ' - ' + df_test['Nama Barang']
+    df_prov = df_test[df_test['Month']==bulan[-1]].merge(df_iso[['Nama Cabang','Provinsi','state_code']],how='left',on='Nama Cabang')
     
     if cab != 'All' :
         df_test = df_test[df_test['Nama Cabang']==cab]
@@ -262,9 +301,14 @@ if st.session_state.button_clicked:
     create_line_chart(df_month)
     plot_grouped_barchart(df_test2)    
     barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
+    df_prov['state_code'] = 'ID-'+df_prov['state_code']
+
     if 'All' in barang:
         df_test = df_test.drop(columns='Filter Barang')
+        df_prov = df_prov.groupby(['Provinsi','state_code'])[['WEIGHT AVG']].mean().reset_index()
     if 'All' not in barang:
         df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
+        df_prov = df_prov[df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi','state_code'])[['WEIGHT AVG']].mean().reset_index()
+    create_sales_map_chart(df_prov)
     st.dataframe(df_test, use_container_width=True, hide_index=True)
 
