@@ -308,14 +308,14 @@ if st.session_state.button_clicked:
     create_line_chart(st.session_state.filtered_df_month)
     plot_grouped_barchart(st.session_state.filtered_df_test2)    
     barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
-    
-    if 'All' in barang:
-        df_test = df_test.drop(columns='Filter Barang')
-        df_prov = df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-    if 'All' not in barang:
-        df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-        df_prov = df_prov[df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-    st.session_state.filtered_df_test = df_test
-    create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
-    st.dataframe(st.session_state.filtered_df_test, use_container_width=True, hide_index=True)
+    if st.button('Filter'):
+        if 'All' in barang:
+            df_test = df_test.drop(columns='Filter Barang')
+            df_prov = df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        if 'All' not in barang:
+            df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
+            df_prov = df_prov[df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        st.session_state.filtered_df_test = df_test
+        create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
+        st.dataframe(st.session_state.filtered_df_test, use_container_width=True, hide_index=True)
         
