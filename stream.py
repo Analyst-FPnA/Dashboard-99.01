@@ -29,7 +29,7 @@ def create_sales_map_chart(df):
         locations='properties', 
         featureidkey="properties.Propinsi", 
         color='WEIGHT AVG',
-        hover_name='Provinsi',
+        hover_name='properties',
         hover_data={'WEIGHT AVG': True},
         color_continuous_scale='Viridis',
         title='WEIGHT AVG'
