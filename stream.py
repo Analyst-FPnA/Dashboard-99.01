@@ -28,7 +28,7 @@ def create_sales_map_chart(df):
         color='WEIGHT AVG',
         hover_name='Provinsi',
         hover_data={'WEIGHT AVG': True},
-        color_continuous_scale='Viridis'
+        color_continuous_scale='Viridis',
         title='WEIGHT AVG'
     )
     
