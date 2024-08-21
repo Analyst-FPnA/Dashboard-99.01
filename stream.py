@@ -243,7 +243,7 @@ if st.session_state.button_clicked:
     df_9901['Kategori Barang'] = df_9901['Kategori Barang'].replace('','LAINNYA')
     
     df_prov = pd.read_csv('data_provinsi.csv')
-    prov = pd.read_csv('prov.csv')
+    
     db = pd.read_csv('database barang.csv')
     db = db.drop_duplicates()
     db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
@@ -304,18 +304,19 @@ if st.session_state.button_clicked:
         df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
     st.session_state.filtered_df_month = df_month    
     st.session_state.filtered_df_test2 = df_test2
+    st.session_state.filtered_df_test = df_test
+    st.session_state.filtered_df_prov = df_prov
     
     create_line_chart(st.session_state.filtered_df_month)
     plot_grouped_barchart(st.session_state.filtered_df_test2)    
-    
+prov = pd.read_csv('prov.csv')    
 barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
 if 'All' in barang:
-    df_test = df_test.drop(columns='Filter Barang')
-    df_prov = df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+    df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
+    df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
 if 'All' not in barang:
-    df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-    df_prov = df_prov[df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-st.session_state.filtered_df_test = df_test
+    df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
+    df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
 create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
-st.dataframe(st.session_state.filtered_df_test, use_container_width=True, hide_index=True)
+st.dataframe(df_test, use_container_width=True, hide_index=True)
         
