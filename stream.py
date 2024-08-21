@@ -307,7 +307,7 @@ if st.session_state.button_clicked:
     
     create_line_chart(st.session_state.filtered_df_month)
     plot_grouped_barchart(st.session_state.filtered_df_test2)    
-    barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
+    barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'], on_change=reset_button_state)
     if st.button('Filter'):
         if 'All' in barang:
             df_test = df_test.drop(columns='Filter Barang')
