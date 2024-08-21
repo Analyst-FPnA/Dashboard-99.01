@@ -298,7 +298,7 @@ if st.session_state.button_clicked:
     
     if 'All' in barang:
         df_test = df_test.drop(columns='Filter Barang')
-        df_prov = df_prov.groupby(['Provinsi','state_code'])[['WEIGHT AVG']].mean().reset_index()
+        df_prov = df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
     if 'All' not in barang:
         df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
         df_prov = df_prov[df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
