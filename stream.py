@@ -308,15 +308,17 @@ if st.session_state.button_clicked:
     st.session_state.filtered_df_prov = df_prov
     
     create_line_chart(st.session_state.filtered_df_month)
-    plot_grouped_barchart(st.session_state.filtered_df_test2)    
-prov = pd.read_csv('prov.csv')    
-barang = st.multiselect("NAMA BARANG:", ['All']+st.session_state.filtered_df_test .sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
-if 'All' in barang:
-    df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
-    df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-if 'All' not in barang:
-    df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-    df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
-st.dataframe(df_test, use_container_width=True, hide_index=True)
+    plot_grouped_barchart(st.session_state.filtered_df_test2)
+    
+if st.session_state.filtered_df_test is not None:
+    prov = pd.read_csv('prov.csv')    
+    barang = st.multiselect("NAMA BARANG:", ['All']+st.session_state.filtered_df_test .sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
+    if 'All' in barang:
+        df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
+        df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+    if 'All' not in barang:
+        df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
+        df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+    create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
+    st.dataframe(df_test, use_container_width=True, hide_index=True)
         
