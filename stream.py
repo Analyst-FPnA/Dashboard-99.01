@@ -21,15 +21,16 @@ import plotly.graph_objs as go
 def create_sales_map_chart(df):
     
     # Membuat peta choropleth
-    fig = go.Figure(go.Choropleth(
-        geojson="https://raw.githubusercontent.com/kelvins/ISO-3166-Countries-with-Regional-Codes/master/all/all.geojson",
-        locations=df['state_code'],
-        z=df['WEIGHT AVG'],
-        featureidkey="properties.iso_3166_2",
-        locationmode='geojson-id',
-        colorscale='Blues',
-        colorbar_title="Sales",
-    ))
+    fig =  go.Figure(data=go.Choropleth(
+    locations = df['state_code'],
+    z = df['WEIGHT AVG'],
+    text = df['Provinsi'],
+    colorscale = 'Inferno',
+    autocolorscale=False,
+    reversescale=True,
+    marker_line_color='darkgray',
+    marker_line_width=0.5,
+    colorbar_title = 'Years'))
 
     # Mengatur layout peta
     fig.update_geos(fitbounds="locations", visible=False)
