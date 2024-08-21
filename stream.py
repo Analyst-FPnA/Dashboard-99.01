@@ -38,16 +38,8 @@ def create_sales_map_chart(df):
     # Mengupdate peta untuk fokus ke Indonesia
     fig.update_geos(
     fitbounds="locations", 
-    visible=False, 
-    showcountries=True, 
-    countrycolor="Black",  # Menambahkan batas negara
-    showcoastlines=True, 
-    coastlinecolor="Black",  # Menambahkan garis pantai
-    showland=True, 
-    landcolor="lightgray",  # Warna tanah
-    showocean=True, 
-    oceancolor="lightblue",  # Warna lautan
-    )
+    visible=False,
+    showocean=True)
     
     # Menyesuaikan tampilan layout
     fig.update_layout(
