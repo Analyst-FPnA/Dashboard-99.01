@@ -192,23 +192,23 @@ if 'df_9901' not in locals():
 
 col = st.columns(3)
 with col[0]:
-    pic = st.selectbox("PIC:", ['RESTO','CP','WIP','LAINNYA'], index=0)
+    pic = st.selectbox("PIC:", ['RESTO','CP','WIP','LAINNYA'], index=0, on_change=reset_button_state)
 with col[1]:
-    cab = st.selectbox("NAMA CABANG:", ['All'] + sorted(df_9901['Nama Cabang'].unique().tolist()), index=0)
+    cab = st.selectbox("NAMA CABANG:", ['All'] + sorted(df_9901['Nama Cabang'].unique().tolist()), index=0, on_change=reset_button_state)
 with col[2]:
-    kategori_barang = st.selectbox("KATEGORI BARANG:", ['All'] + df_9901['Kategori Barang'].unique().tolist(), index=df_9901['Kategori Barang'].unique().tolist().index('10.FOOD [RM] - COM')+1)
+    kategori_barang = st.selectbox("KATEGORI BARANG:", ['All'] + df_9901['Kategori Barang'].unique().tolist(), index=df_9901['Kategori Barang'].unique().tolist().index('10.FOOD [RM] - COM')+1, on_change=reset_button_state)
 
 col = st.columns(3)
 with col[0]:
-    wa_qty = st.selectbox("WEIGHT AVG/QTY:", ['WEIGHT AVG','QUANTITY'], index= 0)
+    wa_qty = st.selectbox("WEIGHT AVG/QTY:", ['WEIGHT AVG','QUANTITY'], index= 0, on_change=reset_button_state)
 with col[1]:
     list_bulan = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December']
-    bulan = st.multiselect("BULAN:", list_bulan, default = ['May','June','July'])
+    bulan = st.multiselect("BULAN:", list_bulan, default = ['May','June','July'], on_change=reset_button_state)
     bulan = sorted(bulan, key=lambda x: list_bulan.index(x))
 
-category = st.selectbox("TOP/BOTTOM:", ['TOP','BOTTOM'], index= 0)
+category = st.selectbox("TOP/BOTTOM:", ['TOP','BOTTOM'], index= 0, on_change=reset_button_state)
 
 if st.button('Show'):
     st.session_state.button_clicked = True
