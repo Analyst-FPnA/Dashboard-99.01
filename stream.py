@@ -36,9 +36,7 @@ def create_sales_map_chart(df):
     )
     
     # Mengupdate peta untuk fokus ke Indonesia
-    fig.update_geos(
-    fitbounds="locations",
-    showcountries=False)
+
     
     # Menyesuaikan tampilan layout
     fig.update_layout(
