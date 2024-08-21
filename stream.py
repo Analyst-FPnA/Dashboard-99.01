@@ -310,7 +310,7 @@ if st.session_state.button_clicked:
     create_line_chart(st.session_state.filtered_df_month)
     plot_grouped_barchart(st.session_state.filtered_df_test2)    
 prov = pd.read_csv('prov.csv')    
-barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
+barang = st.multiselect("NAMA BARANG:", ['All']+st.session_state.filtered_df_test .sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
 if 'All' in barang:
     df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
     df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
