@@ -24,7 +24,7 @@ def create_sales_map_chart(df):
         df, 
         geojson=geojson_url, 
         locations='Provinsi', 
-        featureidkey="properties.name", 
+        featureidkey="properties.Propinsi", 
         color='WEIGHT AVG',
         hover_name='Provinsi',
         hover_data={'WEIGHT AVG': True},
@@ -292,7 +292,7 @@ if st.session_state.button_clicked:
     plot_grouped_barchart(df_test2)    
     barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
     df_prov['state_code'] = 'ID-'+df_prov['state_code']
-
+    df_prov['Provinsi'] = df_prov['Provinsi'].str.upper()
     if 'All' in barang:
         df_test = df_test.drop(columns='Filter Barang')
         df_prov = df_prov.groupby(['Provinsi','state_code'])[['WEIGHT AVG']].mean().reset_index()
@@ -301,4 +301,4 @@ if st.session_state.button_clicked:
         df_prov = df_prov[df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi','state_code'])[['WEIGHT AVG']].mean().reset_index()
     create_sales_map_chart(df_prov)
     st.dataframe(df_test, use_container_width=True, hide_index=True)
-
+        
