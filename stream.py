@@ -26,7 +26,7 @@ def create_sales_map_chart(df):
     fig = px.choropleth(
         df, 
         geojson=ccaa, 
-        locations='Provinsi', 
+        locations='properties', 
         featureidkey="properties.Propinsi", 
         color='WEIGHT AVG',
         hover_name='Provinsi',
@@ -145,8 +145,8 @@ def load_csv(file_path):
 # Unduh file dari GitHub
 download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/PIC v.2.csv', 'PIC v.2.csv')
 download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/database barang.csv', 'database barang.csv')
-download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/df_iso.csv', 'df_iso.csv')
-
+download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/data_provinsi.csv', 'data_provinsi.csv')
+download_file_from_github('https://raw.githubusercontent.com/Analyst-FPnA/Dashboard-99.01/main/prov.csv', 'prov.csv')
 
 st.title('Dashboard - Analisa Harga Barang')
 
@@ -232,7 +232,8 @@ if st.session_state.button_clicked:
     df_9901['PIC'] = df_9901['PIC'].replace('','LAINNYA')
     df_9901['Kategori Barang'] = df_9901['Kategori Barang'].replace('','LAINNYA')
     
-    df_iso = pd.read_csv('df_iso.csv')
+    df_prov = pd.read_csv('data_provinsi.csv')
+    prov = pd.read_csv('prov.csv')
     db = pd.read_csv('database barang.csv')
     db = db.drop_duplicates()
     db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
@@ -245,7 +246,7 @@ if st.session_state.button_clicked:
     df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch.Total')
     df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
     df_test['Filter Barang'] = df_test['Kode #'].astype(str) + ' - ' + df_test['Nama Barang']
-    df_prov = df_test[df_test['Month']==bulan[-1]].merge(df_iso[['Nama Cabang','Provinsi','state_code']],how='left',on='Nama Cabang')
+    df_prov = df_test[df_test['Month']==bulan[-1]].merge(df_prov,how='left',on='Nama Cabang')
     
     if cab != 'All' :
         df_test = df_test[df_test['Nama Cabang']==cab]
@@ -294,14 +295,13 @@ if st.session_state.button_clicked:
     create_line_chart(df_month)
     plot_grouped_barchart(df_test2)    
     barang = st.multiselect("NAMA BARANG:", ['All']+df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
-    df_prov['state_code'] = 'ID-'+df_prov['state_code']
-    df_prov['Provinsi'] = df_prov['Provinsi'].str.upper()
+    
     if 'All' in barang:
         df_test = df_test.drop(columns='Filter Barang')
         df_prov = df_prov.groupby(['Provinsi','state_code'])[['WEIGHT AVG']].mean().reset_index()
     if 'All' not in barang:
         df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-        df_prov = df_prov[df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi','state_code'])[['WEIGHT AVG']].mean().reset_index()
-    create_sales_map_chart(df_prov)
+        df_prov = df_prov[df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+    create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
     st.dataframe(df_test, use_container_width=True, hide_index=True)
         
