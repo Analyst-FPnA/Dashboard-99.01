@@ -36,7 +36,26 @@ def create_sales_map_chart(df):
     )
     
     # Mengupdate peta untuk fokus ke Indonesia
-    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_geos(
+    fitbounds="locations", 
+    visible=False, 
+    showcountries=True, 
+    countrycolor="Black",  # Menambahkan batas negara
+    showcoastlines=True, 
+    coastlinecolor="Black",  # Menambahkan garis pantai
+    showland=True, 
+    landcolor="lightgray",  # Warna tanah
+    showocean=True, 
+    oceancolor="lightblue",  # Warna lautan
+    )
+    
+    # Menyesuaikan tampilan layout
+    fig.update_layout(
+        margin={"r":0,"t":50,"l":0,"b":0},  # Margin minimal untuk memenuhi layar
+        geo=dict(
+            projection_scale=7  # Memperbesar peta
+        ),
+    )
 
     # Menampilkan map chart di Streamlit
     st.plotly_chart(fig, use_container_width=True)
