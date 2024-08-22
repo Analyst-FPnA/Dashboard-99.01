@@ -293,23 +293,23 @@ if 'filtered_df_test' not in st.session_state:
                 df_test2 = df_test[(df_test[df_test.columns[-1]]<0)].head(10)       
         
     
-    df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]] = df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]].applymap(lambda x: f'{x*100:.2f}%')
-    if len([x  for x in df_test.columns if 'Diff' in x])>1:
-        df_test = df_test.drop(columns=[df_test.columns[-2]])
-    df_month = df_test[[x for x in df_test.columns if x in list_bulan]].replace('',np.nan).fillna(method='ffill', axis=1).fillna(method='bfill', axis=1).mean().apply(lambda x: f'{x:.3f}')
-    if wa_qty =='WEIGHT AVG':     
-        df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
-        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
-    if wa_qty =='QUANTITY':     
-        df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
-        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
-    st.session_state.filtered_df_month = df_month    
-    st.session_state.filtered_df_test2 = df_test2
-    st.session_state.filtered_df_test = df_test
-    st.session_state.filtered_df_prov = df_prov
-    
-    create_line_chart(st.session_state.filtered_df_month)
-    plot_grouped_barchart(st.session_state.filtered_df_test2)
+        df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]] = df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]].applymap(lambda x: f'{x*100:.2f}%')
+        if len([x  for x in df_test.columns if 'Diff' in x])>1:
+            df_test = df_test.drop(columns=[df_test.columns[-2]])
+        df_month = df_test[[x for x in df_test.columns if x in list_bulan]].replace('',np.nan).fillna(method='ffill', axis=1).fillna(method='bfill', axis=1).mean().apply(lambda x: f'{x:.3f}')
+        if wa_qty =='WEIGHT AVG':     
+            df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
+            df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
+        if wa_qty =='QUANTITY':     
+            df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
+            df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
+        st.session_state.filtered_df_month = df_month    
+        st.session_state.filtered_df_test2 = df_test2
+        st.session_state.filtered_df_test = df_test
+        st.session_state.filtered_df_prov = df_prov
+        
+        create_line_chart(st.session_state.filtered_df_month)
+        plot_grouped_barchart(st.session_state.filtered_df_test2)
 
 if 'filtered_df_test' in st.session_state:
     prov = pd.read_csv('prov.csv')    
