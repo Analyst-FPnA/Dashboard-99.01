@@ -321,6 +321,7 @@ if 'filtered_df_test' in st.session_state:
     if 'All' not in barang:
         df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
         df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+    df_prov['Provinsi'] = df_prov['Provinsi'].replace('BANTEN','PROBANTEN')
     create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
     st.dataframe(df_test, use_container_width=True, hide_index=True)
         
