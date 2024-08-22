@@ -299,10 +299,8 @@ if 'filtered_df_test' not in st.session_state:
         df_month = df_test[[x for x in df_test.columns if x in list_bulan]].replace('',np.nan).fillna(method='ffill', axis=1).fillna(method='bfill', axis=1).mean().apply(lambda x: f'{x:.3f}')
         if wa_qty =='WEIGHT AVG':     
             df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
-            df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
         if wa_qty =='QUANTITY':     
             df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
-            df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
         st.session_state.filtered_df_month = df_month    
         st.session_state.filtered_df_test2 = df_test2
         st.session_state.filtered_df_test = df_test
@@ -318,16 +316,19 @@ if ('filtered_df_test' in st.session_state) :
     
     if 'All' in barang:
         df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
-        if wa_qty =='WEIGHT AVG':
-            df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-        if wa_qty =='QUANTITY':
-            df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['QUANTITY']].sum().reset_index()
+        df_prov = st.session_state.filtered_df_prov
     if 'All' not in barang:
         df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-        if wa_qty =='WEIGHT AVG':
-            df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-        if wa_qty =='QUANTITY':
-            df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['QUANTITY']].sum().reset_index()
+        df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)]
+
+    if wa_qty =='WEIGHT AVG':
+        df_prov = df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
+
+    if wa_qty =='QUANTITY':
+        df_prov = df_prov.groupby(['Provinsi'])[['QUANTITY']].sum().reset_index()
+        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
+
     df_prov['Provinsi'] = df_prov['Provinsi'].replace('BANTEN','PROBANTEN')
     create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
     st.dataframe(df_test, use_container_width=True, hide_index=True)
