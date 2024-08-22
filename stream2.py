@@ -18,39 +18,6 @@ import plotly.graph_objs as go
 from urllib.request import urlopen
 import json
 
-def create_horizontal_barchart(df, x_col, y_col):
-    """
-    Membuat horizontal bar chart dengan Plotly.
-
-    Parameters:
-    - df: DataFrame yang berisi data.
-    - x_col: Nama kolom yang akan digunakan sebagai sumbu x.
-    - y_col: Nama kolom yang akan digunakan sebagai sumbu y.
-    - title: Judul plot.
-    """
-    
-    # Membuat trace untuk bar chart
-    trace = go.Bar(
-        x=df[x_col],
-        y=df[y_col],
-        orientation='h',  # Mengatur orientasi menjadi horizontal
-        marker=dict(color='blue')
-    )
-    
-    # Membuat layout untuk plot
-    layout = go.Layout(
-        xaxis=dict(title=x_col, titlefont=dict(size=16, color='darkblue')),
-        yaxis=dict(title=y_col, titlefont=dict(size=16, color='darkblue')),
-        plot_bgcolor='white',
-        hovermode='closest'
-    )
-    
-    # Membuat figure dari trace dan layout
-    fig = go.Figure(data=[trace], layout=layout)
-    
-    # Menampilkan plot di Streamlit
-    st.plotly_chart(fig, use_container_width=True)
-    
 with urlopen('https://github.com/superpikar/indonesia-geojson/blob/master/indonesia-province.json?raw=true') as response:
     ccaa = json.load(response)
 # Fungsi untuk membuat map chart
@@ -61,11 +28,11 @@ def create_sales_map_chart(df):
         geojson=ccaa, 
         locations='properties', 
         featureidkey="properties.Propinsi", 
-        color='WEIGHT AVG',
+        color=f'{wa_qty}',
         hover_name='properties',
-        hover_data={'WEIGHT AVG': True},
+        hover_data={f'{wa_qty}': True},
         color_continuous_scale='Viridis',
-        title='WEIGHT AVG'
+        title=f'{wa_qty}'
     )
     
     # Mengupdate peta untuk fokus ke Indonesia
@@ -332,17 +299,15 @@ if 'filtered_df_test' not in st.session_state:
         df_month = df_test[[x for x in df_test.columns if x in list_bulan]].replace('',np.nan).fillna(method='ffill', axis=1).fillna(method='bfill', axis=1).mean().apply(lambda x: f'{x:.3f}')
         if wa_qty =='WEIGHT AVG':     
             df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
-            df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
         if wa_qty =='QUANTITY':     
             df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]] = df_test2.loc[:,[x for x in df_test2.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
-            df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
         st.session_state.filtered_df_month = df_month    
         st.session_state.filtered_df_test2 = df_test2
         st.session_state.filtered_df_test = df_test
         st.session_state.filtered_df_prov = df_prov
         st.session_state.wa_qty = wa_qty
-        
-if 'filtered_df_test' in st.session_state:
+
+if ('filtered_df_test' in st.session_state) :
     create_line_chart(st.session_state.filtered_df_month)
     plot_grouped_barchart(st.session_state.filtered_df_test2)
     prov = pd.read_csv('prov.csv')    
@@ -351,10 +316,20 @@ if 'filtered_df_test' in st.session_state:
     
     if 'All' in barang:
         df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
-        df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        df_prov = st.session_state.filtered_df_prov
     if 'All' not in barang:
         df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-        df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)]
+
+    if wa_qty =='WEIGHT AVG':
+        df_prov = df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
+
+    if wa_qty =='QUANTITY':
+        df_prov = df_prov.groupby(['Provinsi'])[['QUANTITY']].sum().reset_index()
+        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
+
+    df_prov['Provinsi'] = df_prov['Provinsi'].replace('BANTEN','PROBANTEN')
     create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
-    st.dataframe(df_test, use_container_width=True, hide_index=True)
+    st.dataframe(df_test.style.background_gradient(cmap='Reds'), use_container_width=True, hide_index=True)
         
