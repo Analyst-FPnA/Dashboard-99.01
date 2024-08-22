@@ -323,13 +323,14 @@ if ('filtered_df_test' in st.session_state) :
 
     if wa_qty =='WEIGHT AVG':
         df_prov = df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.2f}' if isinstance(x, float) else x)
+        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.2f}' if isinstance(x, float) else x)
 
     if wa_qty =='QUANTITY':
         df_prov = df_prov.groupby(['Provinsi'])[['QUANTITY']].sum().reset_index()
-        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:,.0f}' if isinstance(x, float) else x)
+        df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.0f}' if isinstance(x, float) else x)
 
     df_prov['Provinsi'] = df_prov['Provinsi'].replace('BANTEN','PROBANTEN')
     create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
+    df_test = df_test.replace('',0).style.format(lambda x: '' if x==0 else x).background_gradient(cmap='Reds', axis=1, subset=df_test.columns[2:-1])
     st.dataframe(df_test, use_container_width=True, hide_index=True)
         
