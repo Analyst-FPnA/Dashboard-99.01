@@ -318,15 +318,15 @@ if 'filtered_df_test' in st.session_state:
     
     if 'All' in barang:
         df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
-        if st.session_state.wa_qty =='WEIGHT AVG'
+        if st.session_state.wa_qty =='WEIGHT AVG':
             df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-        if st.session_state.wa_qty =='QUANTITY'
+        if st.session_state.wa_qty =='QUANTITY':
             df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['QUANTITY']].sum().reset_index()
     if 'All' not in barang:
         df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-        if st.session_state.wa_qty =='WEIGHT AVG'
+        if st.session_state.wa_qty =='WEIGHT AVG':
             df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-        if st.session_state.wa_qty =='QUANTITY'
+        if st.session_state.wa_qty =='QUANTITY':
             df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['QUANTITY']].sum().reset_index()
     df_prov['Provinsi'] = df_prov['Provinsi'].replace('BANTEN','PROBANTEN')
     create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
