@@ -28,11 +28,11 @@ def create_sales_map_chart(df):
         geojson=ccaa, 
         locations='properties', 
         featureidkey="properties.Propinsi", 
-        color='WEIGHT AVG',
+        color=f'{st.session_state.wa_qty}',
         hover_name='properties',
-        hover_data={'WEIGHT AVG': True},
+        hover_data={f'{st.session_state.wa_qty}': True},
         color_continuous_scale='Viridis',
-        title='WEIGHT AVG'
+        title=f'{st.session_state.wa_qty}'
     )
     
     # Mengupdate peta untuk fokus ke Indonesia
@@ -307,6 +307,7 @@ if 'filtered_df_test' not in st.session_state:
         st.session_state.filtered_df_test2 = df_test2
         st.session_state.filtered_df_test = df_test
         st.session_state.filtered_df_prov = df_prov
+        st.session_state.wa_qty = wa_qty
 
 if 'filtered_df_test' in st.session_state:
     create_line_chart(st.session_state.filtered_df_month)
@@ -317,10 +318,16 @@ if 'filtered_df_test' in st.session_state:
     
     if 'All' in barang:
         df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
-        df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        if st.session_state.wa_qty =='WEIGHT AVG'
+            df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        if st.session_state.wa_qty =='QUANTITY'
+            df_prov = st.session_state.filtered_df_prov.groupby(['Provinsi'])[['QUANTITY']].sum().reset_index()
     if 'All' not in barang:
         df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
-        df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        if st.session_state.wa_qty =='WEIGHT AVG'
+            df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
+        if st.session_state.wa_qty =='QUANTITY'
+            df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['QUANTITY']].sum().reset_index()
     df_prov['Provinsi'] = df_prov['Provinsi'].replace('BANTEN','PROBANTEN')
     create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
     st.dataframe(df_test, use_container_width=True, hide_index=True)
