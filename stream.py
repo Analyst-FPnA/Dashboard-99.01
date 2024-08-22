@@ -315,10 +315,10 @@ if ('filtered_df_test' in st.session_state) :
 
     
     if 'All' in barang:
-        df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
+        df_test = df_test.drop(columns='Filter Barang')
         df_prov = st.session_state.filtered_df_prov
     if 'All' not in barang:
-        df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
+        df_test = df_test[df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
         df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)]
 
     if wa_qty =='WEIGHT AVG':
