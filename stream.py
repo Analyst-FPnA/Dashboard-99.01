@@ -31,7 +31,7 @@ def create_sales_map_chart(df):
         color=f'{wa_qty}',
         hover_name='properties',
         hover_data={f'{wa_qty}': True},
-        color_continuous_scale='Viridis',
+        color_continuous_scale='YlOrRd',
         title=f'{wa_qty}'
     )
     
