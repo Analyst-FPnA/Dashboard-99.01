@@ -357,7 +357,7 @@ if 'filtered_df_test' in st.session_state:
         df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
     col = st.columns(2)
     with col[0]:
-        create_horizontal_barchart(df_prov.sort_values(f'{st.session_state.wa_qty}'), 'properties', f'{st.session_state.wa_qty}')
+        create_horizontal_barchart(df_prov.sort_values(f'{st.session_state.wa_qty}'), 'Provinsi', f'{st.session_state.wa_qty}')
     with col[1]:
         create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
     st.dataframe(df_test, use_container_width=True, hide_index=True)
