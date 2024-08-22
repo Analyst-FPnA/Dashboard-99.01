@@ -307,11 +307,10 @@ if 'filtered_df_test' not in st.session_state:
         st.session_state.filtered_df_test2 = df_test2
         st.session_state.filtered_df_test = df_test
         st.session_state.filtered_df_prov = df_prov
-        
-        create_line_chart(st.session_state.filtered_df_month)
-        plot_grouped_barchart(st.session_state.filtered_df_test2)
 
 if 'filtered_df_test' in st.session_state:
+    create_line_chart(st.session_state.filtered_df_month)
+    plot_grouped_barchart(st.session_state.filtered_df_test2)
     prov = pd.read_csv('prov.csv')    
     barang = st.multiselect("NAMA BARANG:", ['All']+st.session_state.filtered_df_test.sort_values('Kode #')['Filter Barang'].unique().tolist(), default = ['All'])
 
