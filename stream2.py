@@ -331,5 +331,5 @@ if ('filtered_df_test' in st.session_state) :
 
     df_prov['Provinsi'] = df_prov['Provinsi'].replace('BANTEN','PROBANTEN')
     create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
-    st.dataframe(df_test.replace('',0).style.background_gradient(cmap='Reds',axis=1, subset=df_test.columns[2:-1]).replace(0,''), use_container_width=True, hide_index=True)
+    st.dataframe(df_test.replace('',np.nan).style.background_gradient(cmap='Reds',axis=1, subset=df_test.columns[2:-1]), use_container_width=True, hide_index=True)
         
