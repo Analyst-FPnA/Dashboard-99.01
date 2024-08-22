@@ -213,83 +213,84 @@ category = st.selectbox("TOP/BOTTOM:", ['TOP','BOTTOM'], index= 0, on_change=res
 if st.button('Show'):
     st.session_state.button_clicked = True
     
-if st.session_state.button_clicked:
-    columns_to_clean = ['#Purch.Qty', '#Purch.@Price', '#Purch.Discount', '#Purch.Total', '#Prime.Ratio', '#Prime.Qty', '#Prime.NetPrice']
-    
-    # Remove commas from values in specified columns
-    for col in columns_to_clean:
-        df_9901[col] = df_9901[col].apply(lambda x: x.replace(',', '') if ',' in str(x) else x).astype(float)
-        #df_9901[col] = df_9901[col].apply(lambda x: x.replace('.', '') if '.' in str(x) else x)
-    
-    #Udang Kupas - CP replace Udang Thawing
-    df_9901['Kode #'] = df_9901['Kode #'].replace('100084', '100167')
-    df_9901['Nama Barang'] = df_9901['Nama Barang'].replace('UDANG KUPAS - CP', 'UDANG THAWING')
-    
-    numeric_cols = ['#Purch.Qty', '#Prime.Ratio', '#Prime.Qty', '#Purch.@Price', '#Purch.Discount', '#Prime.NetPrice', '#Purch.Total']
-    df_9901[numeric_cols] = df_9901[numeric_cols].apply(pd.to_numeric)
-    
-    df_pic  =   pd.read_csv('PIC v.2.csv').drop(columns=['Nama Barang','Kategori Barang'])
-    df_pic['Kode #'] = df_pic['Kode #'].astype('int64')
-    
-    df_9901['Kode #'] = df_9901['Kode #'].astype('int64')
-    
-    df_9901 = pd.merge(df_9901, df_pic, how='left', on='Kode #').fillna('')
-    df_9901 = df_9901.loc[:,['Nama Cabang','Kota/Kabupaten','Provinsi Gudang','Nomor #','Tanggal','Pemasok','Kategori Pemasok','#Group','Kode #','Nama Barang','Kategori Barang','#Purch.Qty','#Purch.UoM','#Prime.Ratio','#Prime.Qty','#Prime.UoM','#Purch.@Price','#Purch.Discount','#Prime.NetPrice','#Purch.Total','Month','PIC']]
-    df_9901 = df_9901[df_9901['#Prime.NetPrice']!=0]
-    df_9901['#Prime.Qty'] = df_9901['#Prime.Qty'].astype(float)
-    df_9901['#Purch.Total'] = df_9901['#Purch.Total'].astype(float)
-    
-    df_9901['PIC'] = df_9901['PIC'].replace('','LAINNYA')
-    df_9901['Kategori Barang'] = df_9901['Kategori Barang'].replace('','LAINNYA')
-    
-    df_prov = pd.read_csv('data_provinsi.csv')
-    
-    db = pd.read_csv('database barang.csv')
-    db = db.drop_duplicates()
-    db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
-                    db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
-    
-    df_test = df_9901[(df_9901['PIC']==pic)&(df_9901['Kategori Barang']==kategori_barang)].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
-    
-    
-    df_test['WEIGHT AVG'] = df_test['#Purch.Total'].astype(float)/df_test['#Prime.Qty'].astype(float)
-    df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch.Total')
-    df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
-    df_test['Filter Barang'] = df_test['Kode #'].astype(str) + ' - ' + df_test['Nama Barang']
-    df_prov = df_test[df_test['Month']==bulan[-1]].merge(df_prov,how='left',on='Nama Cabang')
-    
-    if cab != 'All' :
-        df_test = df_test[df_test['Nama Cabang']==cab]
+if 'filtered_df_test' not in st.session_state:   
+    if st.session_state.button_clicked:
+        columns_to_clean = ['#Purch.Qty', '#Purch.@Price', '#Purch.Discount', '#Purch.Total', '#Prime.Ratio', '#Prime.Qty', '#Prime.NetPrice']
         
-    df_test = df_test.groupby(['Month', 'Kode #','Nama Barang','Filter Barang']).agg({'QUANTITY': 'sum','WEIGHT AVG': 'mean'}).reset_index()
-    
-    df_test['Month'] = pd.Categorical(df_test['Month'], categories=list_bulan, ordered=True)
-    df_test = df_test.sort_values('Month')
-    df_test = df_test.pivot(index=['Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
-    
-    if len(bulan)>=3:
-        df_test[f'Diff {bulan[-3]} - {bulan[-2]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-2]] == '') or (row[bulan[-3]]=='')) else ((row[bulan[-2]] - row[bulan[-3]]) / row[bulan[-3]]), axis=1)
-        df_test[f'Diff {bulan[-2]} - {bulan[-1]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-1]] == '') or (row[bulan[-2]]=='')) else ((row[bulan[-1]] - row[bulan[-2]]) / row[bulan[-2]]), axis=1)
-        df_test = df_test.sort_values(df_test.columns[-1],ascending=False) 
-        #df_test.loc[:,df_test.columns[-2:]] = df_test.loc[:,df_test.columns[-2:]].applymap(lambda x: f'{x*100:.2f}%')
-    if len(bulan)==2:
-        df_test[f'Diff {bulan[-2]} - {bulan[-1]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-1]] == '') or (row[bulan[-2]]=='')) else ((row[bulan[-1]] - row[bulan[-2]]) / row[bulan[-2]]), axis=1)
-        df_test = df_test.sort_values(df_test.columns[-1],ascending=False)
-        #df_test.loc[:,df_test.columns[-1]] = df_test.loc[:,df_test.columns[-1:]].apply(lambda x: f'{x*100:.2f}%')
-    
-    if category=='TOP':
-        if len(bulan)>=3:
-            df_test2 = df_test[(df_test[df_test.columns[-1]]>0) & (df_test[df_test.columns[-2]]>0)]
-            df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=False).index].head(10)
-        if len(bulan)==2:
-            df_test2 = df_test[(df_test[df_test.columns[-1]]>0)].head(10)
+        # Remove commas from values in specified columns
+        for col in columns_to_clean:
+            df_9901[col] = df_9901[col].apply(lambda x: x.replace(',', '') if ',' in str(x) else x).astype(float)
+            #df_9901[col] = df_9901[col].apply(lambda x: x.replace('.', '') if '.' in str(x) else x)
         
-    if category=='BOTTOM':
+        #Udang Kupas - CP replace Udang Thawing
+        df_9901['Kode #'] = df_9901['Kode #'].replace('100084', '100167')
+        df_9901['Nama Barang'] = df_9901['Nama Barang'].replace('UDANG KUPAS - CP', 'UDANG THAWING')
+        
+        numeric_cols = ['#Purch.Qty', '#Prime.Ratio', '#Prime.Qty', '#Purch.@Price', '#Purch.Discount', '#Prime.NetPrice', '#Purch.Total']
+        df_9901[numeric_cols] = df_9901[numeric_cols].apply(pd.to_numeric)
+        
+        df_pic  =   pd.read_csv('PIC v.2.csv').drop(columns=['Nama Barang','Kategori Barang'])
+        df_pic['Kode #'] = df_pic['Kode #'].astype('int64')
+        
+        df_9901['Kode #'] = df_9901['Kode #'].astype('int64')
+        
+        df_9901 = pd.merge(df_9901, df_pic, how='left', on='Kode #').fillna('')
+        df_9901 = df_9901.loc[:,['Nama Cabang','Kota/Kabupaten','Provinsi Gudang','Nomor #','Tanggal','Pemasok','Kategori Pemasok','#Group','Kode #','Nama Barang','Kategori Barang','#Purch.Qty','#Purch.UoM','#Prime.Ratio','#Prime.Qty','#Prime.UoM','#Purch.@Price','#Purch.Discount','#Prime.NetPrice','#Purch.Total','Month','PIC']]
+        df_9901 = df_9901[df_9901['#Prime.NetPrice']!=0]
+        df_9901['#Prime.Qty'] = df_9901['#Prime.Qty'].astype(float)
+        df_9901['#Purch.Total'] = df_9901['#Purch.Total'].astype(float)
+        
+        df_9901['PIC'] = df_9901['PIC'].replace('','LAINNYA')
+        df_9901['Kategori Barang'] = df_9901['Kategori Barang'].replace('','LAINNYA')
+        
+        df_prov = pd.read_csv('data_provinsi.csv')
+        
+        db = pd.read_csv('database barang.csv')
+        db = db.drop_duplicates()
+        db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
+                        db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
+        
+        df_test = df_9901[(df_9901['PIC']==pic)&(df_9901['Kategori Barang']==kategori_barang)].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
+        
+        
+        df_test['WEIGHT AVG'] = df_test['#Purch.Total'].astype(float)/df_test['#Prime.Qty'].astype(float)
+        df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch.Total')
+        df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
+        df_test['Filter Barang'] = df_test['Kode #'].astype(str) + ' - ' + df_test['Nama Barang']
+        df_prov = df_test[df_test['Month']==bulan[-1]].merge(df_prov,how='left',on='Nama Cabang')
+        
+        if cab != 'All' :
+            df_test = df_test[df_test['Nama Cabang']==cab]
+            
+        df_test = df_test.groupby(['Month', 'Kode #','Nama Barang','Filter Barang']).agg({'QUANTITY': 'sum','WEIGHT AVG': 'mean'}).reset_index()
+        
+        df_test['Month'] = pd.Categorical(df_test['Month'], categories=list_bulan, ordered=True)
+        df_test = df_test.sort_values('Month')
+        df_test = df_test.pivot(index=['Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
+        
         if len(bulan)>=3:
-            df_test2 = df_test[(df_test[df_test.columns[-1]]<0) & (df_test[df_test.columns[-2]]<0)]
-            df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=True).index].head(10)
+            df_test[f'Diff {bulan[-3]} - {bulan[-2]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-2]] == '') or (row[bulan[-3]]=='')) else ((row[bulan[-2]] - row[bulan[-3]]) / row[bulan[-3]]), axis=1)
+            df_test[f'Diff {bulan[-2]} - {bulan[-1]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-1]] == '') or (row[bulan[-2]]=='')) else ((row[bulan[-1]] - row[bulan[-2]]) / row[bulan[-2]]), axis=1)
+            df_test = df_test.sort_values(df_test.columns[-1],ascending=False) 
+            #df_test.loc[:,df_test.columns[-2:]] = df_test.loc[:,df_test.columns[-2:]].applymap(lambda x: f'{x*100:.2f}%')
         if len(bulan)==2:
-            df_test2 = df_test[(df_test[df_test.columns[-1]]<0)].head(10)       
+            df_test[f'Diff {bulan[-2]} - {bulan[-1]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-1]] == '') or (row[bulan[-2]]=='')) else ((row[bulan[-1]] - row[bulan[-2]]) / row[bulan[-2]]), axis=1)
+            df_test = df_test.sort_values(df_test.columns[-1],ascending=False)
+            #df_test.loc[:,df_test.columns[-1]] = df_test.loc[:,df_test.columns[-1:]].apply(lambda x: f'{x*100:.2f}%')
+        
+        if category=='TOP':
+            if len(bulan)>=3:
+                df_test2 = df_test[(df_test[df_test.columns[-1]]>0) & (df_test[df_test.columns[-2]]>0)]
+                df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=False).index].head(10)
+            if len(bulan)==2:
+                df_test2 = df_test[(df_test[df_test.columns[-1]]>0)].head(10)
+            
+        if category=='BOTTOM':
+            if len(bulan)>=3:
+                df_test2 = df_test[(df_test[df_test.columns[-1]]<0) & (df_test[df_test.columns[-2]]<0)]
+                df_test2 = df_test2.loc[((df_test2[df_test2.columns[-1]] + df_test2[df_test2.columns[-2]]) / 2).sort_values(ascending=True).index].head(10)
+            if len(bulan)==2:
+                df_test2 = df_test[(df_test[df_test.columns[-1]]<0)].head(10)       
         
     
     df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]] = df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]].applymap(lambda x: f'{x*100:.2f}%')
