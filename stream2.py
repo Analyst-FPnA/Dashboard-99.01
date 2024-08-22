@@ -18,6 +18,39 @@ import plotly.graph_objs as go
 from urllib.request import urlopen
 import json
 
+def create_horizontal_barchart(df, x_col, y_col):
+    """
+    Membuat horizontal bar chart dengan Plotly.
+
+    Parameters:
+    - df: DataFrame yang berisi data.
+    - x_col: Nama kolom yang akan digunakan sebagai sumbu x.
+    - y_col: Nama kolom yang akan digunakan sebagai sumbu y.
+    - title: Judul plot.
+    """
+    
+    # Membuat trace untuk bar chart
+    trace = go.Bar(
+        x=df[x_col],
+        y=df[y_col],
+        orientation='h',  # Mengatur orientasi menjadi horizontal
+        marker=dict(color='blue')
+    )
+    
+    # Membuat layout untuk plot
+    layout = go.Layout(
+        xaxis=dict(title=x_col, titlefont=dict(size=16, color='darkblue')),
+        yaxis=dict(title=y_col, titlefont=dict(size=16, color='darkblue')),
+        plot_bgcolor='white',
+        hovermode='closest'
+    )
+    
+    # Membuat figure dari trace dan layout
+    fig = go.Figure(data=[trace], layout=layout)
+    
+    # Menampilkan plot di Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+    
 with urlopen('https://github.com/superpikar/indonesia-geojson/blob/master/indonesia-province.json?raw=true') as response:
     ccaa = json.load(response)
 # Fungsi untuk membuat map chart
@@ -321,6 +354,10 @@ if 'filtered_df_test' in st.session_state:
     if 'All' not in barang:
         df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
         df_prov = st.session_state.filtered_df_prov[st.session_state.filtered_df_prov['Filter Barang'].isin(barang)].groupby(['Provinsi'])[['WEIGHT AVG']].mean().reset_index()
-    create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
+    col = st.columns(2)
+    with col[0]:
+        create_horizontal_barchart(df_prov, 'properties', f'{wa_wty}')
+    with col[1]:
+        create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
     st.dataframe(df_test, use_container_width=True, hide_index=True)
         
