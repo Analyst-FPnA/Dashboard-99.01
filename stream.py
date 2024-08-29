@@ -213,8 +213,8 @@ category = st.selectbox("TOP/BOTTOM:", ['TOP','BOTTOM'], index= 0, on_change=res
 if st.button('Show'):
     st.session_state.button_clicked = True
     
-if 'filtered_df_test' not in st.session_state:   
-    if st.session_state.button_clicked:
+#if 'filtered_df_test' not in st.session_state:   
+if st.session_state.button_clicked:
         columns_to_clean = ['#Purch.Qty', '#Purch.@Price', '#Purch.Discount', '#Purch.Total', '#Prime.Ratio', '#Prime.Qty', '#Prime.NetPrice']
         
         # Remove commas from values in specified columns
