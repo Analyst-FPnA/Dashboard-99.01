@@ -260,8 +260,15 @@ if st.session_state.button_clicked:
         df_prov = df_test[df_test['Month']==bulan[-1]].merge(df_prov,how='left',on='Nama Cabang')
         
         if cab != 'All' :
-            df_test = df_test[df_test['Nama Cabang']==cab]
-            
+            df_test = df_9901[(df_9901['Nama Cabang']==cab)&(df_9901['PIC']==pic)&(df_9901['Kategori Barang']==kategori_barang)].groupby(['Month','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
+        else:
+            df_test = df_9901[(df_9901['PIC']==pic)&(df_9901['Kategori Barang']==kategori_barang)].groupby(['Month','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()        
+        
+        df_test['WEIGHT AVG'] = df_test['#Purch.Total'].astype(float)/df_test['#Prime.Qty'].astype(float)
+        df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch.Total')
+        df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
+        df_test['Filter Barang'] = df_test['Kode #'].astype(str) + ' - ' + df_test['Nama Barang']
+    
         df_test = df_test.groupby(['Month', 'Kode #','Nama Barang','Filter Barang']).agg({'QUANTITY': 'sum','WEIGHT AVG': 'mean'}).reset_index()
         
         df_test['Month'] = pd.Categorical(df_test['Month'], categories=list_bulan, ordered=True)
