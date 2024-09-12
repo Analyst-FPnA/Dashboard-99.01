@@ -226,7 +226,7 @@ if st.session_state.button_clicked:
     
         df_9901['Kode #'] = df_9901['Kode #'].astype(int).astype(str).replace('100084', '100167')
         df_9901['Nama Barang'] = df_9901['Nama Barang'].replace('UDANG KUPAS - CP', 'UDANG THAWING')
-        
+        df_9901 = df_9901[df_9901['Kode #'].astype(int).astype(str) !='100168']
         numeric_cols = ['#Purch.Qty', '#Prime.Ratio', '#Prime.Qty', '#Purch.@Price', '#Purch.Discount', '#Prime.NetPrice', '#Purch.Total']
         df_9901[numeric_cols] = df_9901[numeric_cols].apply(pd.to_numeric)
         
