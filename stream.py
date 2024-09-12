@@ -223,7 +223,8 @@ if st.session_state.button_clicked:
             #df_9901[col] = df_9901[col].apply(lambda x: x.replace('.', '') if '.' in str(x) else x)
         
         #Udang Kupas - CP replace Udang Thawing
-        df_9901['Kode #'] = df_9901['Kode #'].replace('100084', '100167')
+    
+        df_9901['Kode #'] = df_9901['Kode #'].astype(int).astype(str).replace('100084', '100167')
         df_9901['Nama Barang'] = df_9901['Nama Barang'].replace('UDANG KUPAS - CP', 'UDANG THAWING')
         
         numeric_cols = ['#Purch.Qty', '#Prime.Ratio', '#Prime.Qty', '#Purch.@Price', '#Purch.Discount', '#Prime.NetPrice', '#Purch.Total']
