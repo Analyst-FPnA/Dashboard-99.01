@@ -205,7 +205,7 @@ with col[1]:
     list_bulan = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December']
-    bulan = st.multiselect("BULAN:", list_bulan, default = ['August','September','Oktober'], on_change=reset_button_state)
+    bulan = st.multiselect("BULAN:", list_bulan, default = ['August','September','October'], on_change=reset_button_state)
     bulan = sorted(bulan, key=lambda x: list_bulan.index(x))
 
 category = st.selectbox("TOP/BOTTOM:", ['TOP','BOTTOM'], index= 0, on_change=reset_button_state)
