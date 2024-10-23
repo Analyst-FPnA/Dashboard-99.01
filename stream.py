@@ -196,7 +196,7 @@ with col[0]:
 with col[1]:
     cab = st.selectbox("NAMA CABANG:", ['All'] + sorted(df_9901['Nama Cabang'].unique().tolist()), index=0, on_change=reset_button_state)
 with col[2]:
-    kategori_barang = st.selectbox("KATEGORI BARANG:", ['All'] + df_9901['Kategori Barang'].unique().tolist(), index=df_9901['Kategori Barang'].unique().tolist().index('10.FOOD [RM] - COM')+1, on_change=reset_button_state)
+    kategori_barang = st.selectbox("KATEGORI BARANG:", ['All'] + sorted(df_9901['Kategori Barang'].unique().tolist()), index=sorted(df_9901['Kategori Barang'].unique().tolist()).index('10.FOOD [RM] - COM')+1, on_change=reset_button_state)
 
 col = st.columns(3)
 with col[0]:
@@ -251,7 +251,11 @@ if st.session_state.button_clicked:
         db = pd.concat([db[db['Kode #'].astype(str).str.startswith('1')].sort_values('Kode #').drop_duplicates(subset=['Kode #']),
                         db[~db['Kode #'].astype(str).str.startswith('1')]], ignore_index=True)
         
-        df_test = df_9901[(df_9901['PIC']==pic)&(df_9901['Kategori Barang']==kategori_barang)].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
+        if kategori_barang != 'All':
+            df_test = df_9901[(df_9901['Kategori Barang']==kategori_barang)]
+        else:
+            df_test = df_9901
+        df_test = df_test[(df_test['PIC']==pic)].groupby(['Month', 'Nama Cabang','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
         
         
         df_test['WEIGHT AVG'] = df_test['#Purch.Total'].astype(float)/df_test['#Prime.Qty'].astype(float)
@@ -259,11 +263,16 @@ if st.session_state.button_clicked:
         df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
         df_test['Filter Barang'] = df_test['Kode #'].astype(str) + ' - ' + df_test['Nama Barang']
         df_prov = df_test[df_test['Month']==bulan[-1]].merge(df_prov,how='left',on='Nama Cabang')
-        
-        if cab != 'All' :
-            df_test = df_9901[(df_9901['Nama Cabang']==cab)&(df_9901['PIC']==pic)&(df_9901['Kategori Barang']==kategori_barang)].groupby(['Month','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
+
+        if kategori_barang != 'All':
+            df_test = df_9901[(df_9901['Kategori Barang']==kategori_barang)]
         else:
-            df_test = df_9901[(df_9901['PIC']==pic)&(df_9901['Kategori Barang']==kategori_barang)].groupby(['Month','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()        
+            df_test = df_9901
+            
+        if cab != 'All' :
+            df_test = df_test[(df_test['Nama Cabang']==cab)&(df_test['PIC']==pic)].groupby(['Month','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()
+        else:
+            df_test = df_test[(df_test['PIC']==pic)].groupby(['Month','Kode #']).agg({'#Prime.Qty': 'sum','#Purch.Total': 'sum'}).reset_index()        
         
         df_test['WEIGHT AVG'] = df_test['#Purch.Total'].astype(float)/df_test['#Prime.Qty'].astype(float)
         df_test = df_test.rename(columns={'#Prime.Qty':'QUANTITY'}).drop(columns='#Purch.Total')
