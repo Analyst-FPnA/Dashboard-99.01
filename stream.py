@@ -279,8 +279,11 @@ if st.session_state.button_clicked:
         df_test = df_test.merge(db.drop_duplicates(), how='left', on='Kode #')
         df_test['Filter Barang'] = df_test['Kode #'].astype(str) + ' - ' + df_test['Nama Barang']
     
-        df_test = df_test.groupby(['Month', 'Kode #','Nama Barang','Filter Barang']).agg({'QUANTITY': 'sum','WEIGHT AVG': 'mean'}).reset_index()
-        
+        df_vendor = df_test.groupby(['Month', 'Pemasok', 'Kode #','Nama Barang','Filter Barang']).agg({'QUANTITY': 'sum','WEIGHT AVG': 'mean'}).reset_index()
+        df_vendor['Month'] = pd.Categorical(df_vendor['Month'], categories=list_bulan, ordered=True)
+        df_vendor = df_vendor.sort_values('Month')
+    
+        df_test = df_test.groupby(['Month', 'Kode #','Nama Barang','Filter Barang']).agg({'QUANTITY': 'sum','WEIGHT AVG': 'mean'}).reset_index()  
         df_test['Month'] = pd.Categorical(df_test['Month'], categories=list_bulan, ordered=True)
         df_test = df_test.sort_values('Month')
         df_test = df_test.pivot(index=['Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
@@ -349,7 +352,39 @@ if ('filtered_df_test' in st.session_state) :
         df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.0f}' if isinstance(x, float) else x)
 
     df_prov['Provinsi'] = df_prov['Provinsi'].replace('BANTEN','PROBANTEN')
-    create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
+    #create_sales_map_chart(prov.merge(df_prov,how='left',left_on='properties',right_on='Provinsi').drop(columns='Provinsi').fillna(0))
     df_test = df_test.replace('',0).style.format(lambda x: '' if x==0 else x).background_gradient(cmap='Reds', axis=1, subset=df_test.columns[2:-1])
     st.dataframe(df_test, use_container_width=True, hide_index=True)
+    
+    vendor = st.multiselect("PEMASOK:", ['All']+df_vendor[df_vendor['Filter Barang'].isin(df_vendor['Filter Barang'].unique() if barang==['All'] else barang)].sort_values('Pemasok')['Pemasok'].unique().tolist(), default = ['All'])
+    
+    df_vendor = df_vendor[(df_vendor['Filter Barang'].isin(df_vendor['Filter Barang'].unique() if barang==['All'] else barang)) & (df_vendor['Pemasok'].isin(df_vendor['Pemasok'].unique() if vendor==['All'] else vendor))]
+    dF_test = df_vendor.pivot(index=['Pemasok','Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
         
+        if len(bulan)>=3:
+            df_test[f'Diff {bulan[-3]} - {bulan[-2]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-2]] == '') or (row[bulan[-3]]=='')) else ((row[bulan[-2]] - row[bulan[-3]]) / row[bulan[-3]]), axis=1)
+            df_test[f'Diff {bulan[-2]} - {bulan[-1]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-1]] == '') or (row[bulan[-2]]=='')) else ((row[bulan[-1]] - row[bulan[-2]]) / row[bulan[-2]]), axis=1)
+            df_test = df_test.sort_values(df_test.columns[-1],ascending=False) 
+            #df_test.loc[:,df_test.columns[-2:]] = df_test.loc[:,df_test.columns[-2:]].applymap(lambda x: f'{x*100:.2f}%')
+        if len(bulan)==2:
+            df_test[f'Diff {bulan[-2]} - {bulan[-1]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-1]] == '') or (row[bulan[-2]]=='')) else ((row[bulan[-1]] - row[bulan[-2]]) / row[bulan[-2]]), axis=1)
+            df_test = df_test.sort_values(df_test.columns[-1],ascending=False)
+            #df_test.loc[:,df_test.columns[-1]] = df_test.loc[:,df_test.columns[-1:]].apply(lambda x: f'{x*100:.2f}%')   
+        
+        if 'All' in barang:
+            df_test = st.session_state.filtered_df_test.drop(columns='Filter Barang')
+        if 'All' not in barang:
+            df_test = st.session_state.filtered_df_test[st.session_state.filtered_df_test['Filter Barang'].isin(barang)].drop(columns='Filter Barang')
+    
+        if wa_qty =='WEIGHT AVG':
+            df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.2f}' if isinstance(x, float) else x)
+    
+        if wa_qty =='QUANTITY':
+            df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.0f}' if isinstance(x, float) else x)
+
+        df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]] = df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]].applymap(lambda x: f'{x*100:.2f}%')
+        if len([x  for x in df_test.columns if 'Diff' in x])>1:
+            df_test = df_test.drop(columns=[df_test.columns[-2]])
+
+        df_test = df_test.replace('',0).style.format(lambda x: '' if x==0 else x).background_gradient(cmap='Reds', axis=1, subset=df_test.columns[2:-1])
+        st.dataframe(df_test, use_container_width=True, hide_index=True)
