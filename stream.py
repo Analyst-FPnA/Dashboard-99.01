@@ -388,5 +388,5 @@ if ('filtered_df_test' in st.session_state) :
     if len([x  for x in df_test.columns if 'Diff' in x])>1:
         df_test = df_test.drop(columns=[df_test.columns[-2]])
 
-    df_test = df_test.replace('',0).style.format(lambda x: '' if x==0 else x).background_gradient(cmap='Reds', axis=1, subset=df_test.columns[2:-1])
+    df_test = df_test.replace('',0).style.format(lambda x: '' if x==0 else x).background_gradient(cmap='Reds', axis=1, subset=df_test.columns[3:-1])
     st.dataframe(df_test, use_container_width=True, hide_index=True)
