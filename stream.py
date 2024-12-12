@@ -366,7 +366,7 @@ if ('filtered_df_test' in st.session_state) :
     vendor = st.multiselect("PEMASOK:", ['All']+df_vendor[df_vendor['Filter Barang'].isin(df_vendor['Filter Barang'].unique() if barang==['All'] else barang)].sort_values('Pemasok')['Pemasok'].unique().tolist(), default = ['All'])
     
     df_vendor = df_vendor[(df_vendor['Filter Barang'].isin(df_vendor['Filter Barang'].unique() if barang==['All'] else barang)) & (df_vendor['Pemasok'].isin(df_vendor['Pemasok'].unique() if vendor==['All'] else vendor))]
-    df_test = df_vendor.pivot(index=['Pemasok','Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
+    df_test = df_vendor.pivot(index=['Pemasok','Kode #','Nama Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
 
     if len(bulan)>=3:
         df_test[f'Diff {bulan[-3]} - {bulan[-2]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-2]] == '') or (row[bulan[-3]]=='')) else ((row[bulan[-2]] - row[bulan[-3]]) / row[bulan[-3]]), axis=1)
@@ -388,5 +388,5 @@ if ('filtered_df_test' in st.session_state) :
     if len([x  for x in df_test.columns if 'Diff' in x])>1:
         df_test = df_test.drop(columns=[df_test.columns[-2]])
     st.dataframe(df_test)
-    df_test = df_test.drop(columns='Filter Barang').replace('',0).style.format(lambda x: '' if x==0 else x).background_gradient(cmap='Reds', axis=1, subset=df_test.columns[3:-1])
+    df_test = df_test.replace('',0).style.format(lambda x: '' if x==0 else x).background_gradient(cmap='Reds', axis=1, subset=df_test.columns[3:-1])
     st.dataframe(df_test, use_container_width=True, hide_index=True)
