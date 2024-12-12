@@ -366,7 +366,7 @@ if ('filtered_df_test' in st.session_state) :
     vendor = st.multiselect("PEMASOK:", ['All']+df_vendor[df_vendor['Filter Barang'].isin(df_vendor['Filter Barang'].unique() if barang==['All'] else barang)].sort_values('Pemasok')['Pemasok'].unique().tolist(), default = ['All'])
     
     df_vendor = df_vendor[(df_vendor['Filter Barang'].isin(df_vendor['Filter Barang'].unique() if barang==['All'] else barang)) & (df_vendor['Pemasok'].isin(df_vendor['Pemasok'].unique() if vendor==['All'] else vendor))]
-    dF_test = df_vendor.pivot(index=['Pemasok','Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
+    df_test = df_vendor.pivot(index=['Pemasok','Kode #','Nama Barang','Filter Barang'],columns='Month',values=wa_qty).fillna('').reset_index()
     
     if len(bulan)>=3:
         df_test[f'Diff {bulan[-3]} - {bulan[-2]}'] = df_test.apply(lambda row: 0 if ((row[bulan[-2]] == '') or (row[bulan[-3]]=='')) else ((row[bulan[-2]] - row[bulan[-3]]) / row[bulan[-3]]), axis=1)
