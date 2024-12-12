@@ -282,7 +282,7 @@ if st.session_state.button_clicked:
         df_vendor['Filter Barang'] = df_vendor['Kode #'].astype(str) + ' - ' + df_vendor['Nama Barang']
     
         df_vendor = df_vendor.groupby(['Month','Pemasok','Kode #','Nama Barang','Filter Barang']).agg({'QUANTITY': 'sum','WEIGHT AVG': 'mean'}).reset_index()  
-        df_vendor['Month'] = pd.Categorical(df_test['Month'], categories=list_bulan, ordered=True)
+        df_vendor['Month'] = pd.Categorical(df_vendor['Month'], categories=list_bulan, ordered=True)
         df_vendor = df_vendor.sort_values('Month')
     
         df_test['WEIGHT AVG'] = df_test['#Purch.Total'].astype(float)/df_test['#Prime.Qty'].astype(float)
