@@ -388,7 +388,7 @@ if ('filtered_df_test' in st.session_state) :
 
     if wa_qty =='QUANTITY':
         df_test.loc[:,[x for x in df_test.columns if x in list_bulan]] = df_test.loc[:,[x for x in df_test.columns if x in list_bulan]].applymap(lambda x: f'{x:.0f}' if isinstance(x, float) else x)
-
+    st.dataframe(df_test)
     df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]] = df_test.loc[:,[x  for x in df_test.columns if 'Diff' in x]].applymap(lambda x: f'{x*100:.2f}%')
     if len([x  for x in df_test.columns if 'Diff' in x])>1:
         df_test = df_test.drop(columns=[df_test.columns[-2]])
